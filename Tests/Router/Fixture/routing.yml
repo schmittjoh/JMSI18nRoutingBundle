@@ -1,0 +1,25 @@
+homepage:
+    pattern: /
+    defaults: { _controller: bar }
+
+welcome:
+    pattern: /welcome
+    defaults: { _controller: foo }
+
+untranslated_route:
+    pattern: /not-translated
+    
+not_available_in_all_locales:
+    pattern: /not-available-in-all-locales
+    options: { i18n_locales: [de, en] }
+
+login:
+    pattern: /login
+    requirements: { _scheme: https }
+
+non_i18n_route:
+    pattern: /non-i18n-route
+    options: { i18n: false }
+
+_internal:
+    pattern: /internal
