@@ -15,7 +15,7 @@
     </parameters>
 
     <services>
-    	<service id="jms_i18n_routing.router" class="%jms_i18n_routing.router.class%" parent="router" public="false">
+    	<service id="jms_i18n_routing.router" class="%jms_i18n_routing.router.class%" parent="router.default" public="false">
     		<call method="setI18nLoaderId">
     			<argument>jms_i18n_routing.loader</argument>
     		</call>

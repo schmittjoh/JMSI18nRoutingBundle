@@ -33,20 +33,7 @@ class JMSI18nRoutingBundle extends Bundle
 {
     public function build(ContainerBuilder $container)
     {
-        $config = $container->getCompilerPassConfig();
-        $passes = $config->getOptimizationPasses();
-        for ($i=0,$c=count($passes); $i<$c; $i++) {
-            if ($passes[$i] instanceof ResolveDefinitionTemplatesPass) {
-                $passes = array_merge(
-                    array_splice($passes, 0, $i+1),
-                    array(new SetRouterPass()),
-                    array_splice($passes, $i)
-                );
-
-                break;
-            }
-        }
-        $config->setOptimizationPasses($passes);
+        $container->addCompilerPass(new SetRouterPass());
     }
 
     public function getContainerExtension()

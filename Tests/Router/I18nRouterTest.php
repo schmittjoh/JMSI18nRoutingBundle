@@ -18,6 +18,8 @@
 
 namespace JMS\I18nRoutingBundle\Tests\Router;
 
+use Symfony\Component\Translation\IdentityTranslator;
+
 use Symfony\Component\Translation\Loader\YamlFileLoader as TranslationLoader;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\Translator;
@@ -95,6 +97,12 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/internal?_locale=de', $router->generate('_internal', array('_locale' => 'de')));
     }
 
+    public function testGenerateWithNonI18nRoute()
+    {
+        $router = $this->getRouter('routing.yml', new IdentityTranslator(new MessageSelector()));
+        $this->assertEquals('/this-is-used-for-checking-login', $router->generate('login_check'));
+    }
+
     public function testMatch()
     {
         $router = $this->getRouter();
@@ -124,16 +132,19 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         ), $router->match('/willkommen-auf-unserer-webseite'));
     }
 
-    private function getRouter($config = 'routing.yml')
+    private function getRouter($config = 'routing.yml', $translator = null)
     {
         $container = new Container();
         $container->set('routing.loader', new YamlFileLoader(new FileLocator(__DIR__.'/Fixture')));
 
-        $translator = new Translator('en', new MessageSelector());
-        $translator->setFallbackLocale('en');
-        $translator->addLoader('yml', new TranslationLoader());
-        $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.de.yml'), 'de', 'routes');
-        $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en.yml'), 'en', 'routes');
+        if (null === $translator) {
+            $translator = new Translator('en', new MessageSelector());
+            $translator->setFallbackLocale('en');
+            $translator->addLoader('yml', new TranslationLoader());
+            $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.de.yml'), 'de', 'routes');
+            $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en.yml'), 'en', 'routes');
+        }
+
         $container->set('i18n_loader', new I18nLoader($translator, array('en', 'de', 'fr'), 'en', 'routes', sys_get_temp_dir()));
 
         $router = new I18nRouter($container, $config);

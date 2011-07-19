@@ -16,6 +16,10 @@ not_available_in_all_locales:
 login:
     pattern: /login
     requirements: { _scheme: https }
+    
+login_check:
+    pattern: /this-is-used-for-checking-login
+    options: { i18n: false }
 
 non_i18n_route:
     pattern: /non-i18n-route
