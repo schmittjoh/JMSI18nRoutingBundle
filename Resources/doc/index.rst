@@ -16,7 +16,7 @@ Installation
 ------------
 Checkout a copy of the code::
 
-    git submodule add https://github.com/schmittjoh/I18nRoutingBundle.git src/JMS/I18nRoutingBundle
+    git submodule add https://github.com/schmittjoh/JMSI18nRoutingBundle.git src/JMS/I18nRoutingBundle
 
 Then register the bundle with your kernel::
 
