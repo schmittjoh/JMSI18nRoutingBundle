@@ -145,8 +145,12 @@ class I18nRouter extends Router
                 'scheme'      => $this->context->getScheme(),
                 'httpPort'    => $this->context->getHttpPort(),
                 'httpsPort'   => $this->context->getHttpsPort(),
-                '_route'      => $params['_route'],
+                '_route'      => substr($params['_route'], strlen($params['_locale'])+1),
             );
+        }
+
+        if (isset($params['_locale']) && 0 === strpos($params['_route'], $params['_locale'].'_')) {
+            $params['_route'] = substr($params['_route'], strlen($params['_locale']) + 1);
         }
 
         return $params;

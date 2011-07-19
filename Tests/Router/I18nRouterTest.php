@@ -110,7 +110,7 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $context->setParameter('_locale', 'en');
         $router->setContext($context);
 
-        $this->assertEquals(array('_controller' => 'foo', '_locale' => 'en', '_route' => 'en_welcome'), $router->match('/welcome-on-our-website'));
+        $this->assertEquals(array('_controller' => 'foo', '_locale' => 'en', '_route' => 'welcome'), $router->match('/welcome-on-our-website'));
 
         $this->assertEquals(array(
             '_controller' => 'JMS\I18nRoutingBundle\Controller\RedirectController::redirectAction',
@@ -120,7 +120,7 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
             'scheme'      => 'http',
             'httpPort'    => 80,
             'httpsPort'   => 443,
-            '_route'      => 'de_welcome',
+            '_route'      => 'welcome',
         ), $router->match('/willkommen-auf-unserer-webseite'));
     }
 
