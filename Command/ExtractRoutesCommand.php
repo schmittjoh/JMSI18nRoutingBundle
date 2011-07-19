@@ -33,7 +33,7 @@ class ExtractRoutesCommand extends ContainerAwareCommand
         $this
             ->setName('i18n:extract-routes')
             ->setDescription('Extracts non-localized routes')
-            ->addArgument('locale', InputArgument::REQUIRED, 'The locale to extract routes for')
+            ->addArgument('locale', InputArgument::OPTIONAL, 'The locale to extract routes for')
             ->addOption('delete', null, InputOption::VALUE_NONE, 'Whether to delete routes which have been removed')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Whether to make any actual changes to the translation file')
         ;
@@ -41,35 +41,51 @@ class ExtractRoutesCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $translationFile = $this->getContainer()->getParameter('kernel.root_dir').'/Resources/translations/routes.'.$input->getArgument('locale').'.yml';
-        $translations = file_exists($translationFile) ? Yaml::parse(file_get_contents($translationFile)) : array();
-        $output->writeln(sprintf('<comment>%d</comment> route translations loaded.', count($translations)));
+        $c = $this->getContainer();
 
-        $routes = $this->getContainer()->get('jms_i18n_routing.loader')->extract($this->getContainer()->get('router')->getRouteCollection());
+        if ($locale = $input->getArgument('locale')) {
+            $locales = array($locale);
+        } else {
+            $locales = $c->getParameter('jms_i18n_routing.locales');
+        }
+
+        $routes = $this->getContainer()->get('jms_i18n_routing.loader')->extract($c->get('router')->getRouteCollection());
         $output->writeln(sprintf('<comment>%d</comment> routes found which are eligible for i18n.', count($routes)));
 
-        if ($input->getOption('delete')) {
-            $toDelete = array_diff_key($translations, $routes);
-            $output->writeln(sprintf('Following translations will be deleted: %s', $toDelete? implode(', ', array_keys($toDelete)) : '<comment>none</comment>'));
+        foreach ($locales as $locale) {
+            $translationFile = sprintf(
+                '%s/Resources/translations/%s.%s.yml',
+                $c->getParameter('kernel.root_dir'),
+                $c->getParameter('jms_i18n_routing.catalogue'),
+                $locale
+            );
 
-            $translations = array_intersect_key($translations, $routes);
-        }
+            $translations = file_exists($translationFile) ? Yaml::parse(file_get_contents($translationFile)) : array();
+            $output->writeln(sprintf('Locale "<comment>%s</comment>" - <comment>%d</comment> route translations loaded.', $locale, count($translations)));
 
-        $toAdd = array_diff_key($routes, $translations);
-        $output->writeln(sprintf('Following translations will be added: %s', $toAdd? implode(', ', array_keys($toAdd)) : '<comment>none</comment>'));
-        foreach ($toAdd as $name => $route) {
-            $translations[$name] = $route->getPattern();
-        }
+            if ($input->getOption('delete')) {
+                $toDelete = array_diff_key($translations, $routes);
+                $output->writeln(sprintf('Locale "<comment>%s</comment>" - Following translations will be deleted: %s', $locale, $toDelete? implode(', ', array_keys($toDelete)) : '<comment>none</comment>'));
 
-        if (!$input->getOption('dry-run')) {
-            if (!file_exists(dirname($translationFile))) {
-                if (false === @mkdir(dirname($translationFile), 0777, true)) {
-                    throw new RuntimeException(sprintf('Could not create translation directory "%s".', dirname($translationFile)));
-                }
+                $translations = array_intersect_key($translations, $routes);
             }
 
-            file_put_contents($translationFile, Yaml::dump($translations));
-            $output->writeln(sprintf('Translation file "<comment>%s</comment>" was updated successfully.', $translationFile));
+            $toAdd = array_diff_key($routes, $translations);
+            $output->writeln(sprintf('Locale "<comment>%s</comment>" - Following translations will be added: %s', $locale, $toAdd? implode(', ', array_keys($toAdd)) : '<comment>none</comment>'));
+            foreach ($toAdd as $name => $route) {
+                $translations[$name] = $route->getPattern();
+            }
+
+            if (!$input->getOption('dry-run')) {
+                if (!file_exists(dirname($translationFile))) {
+                    if (false === @mkdir(dirname($translationFile), 0777, true)) {
+                        throw new RuntimeException(sprintf('Could not create translation directory "%s".', dirname($translationFile)));
+                    }
+                }
+
+                file_put_contents($translationFile, Yaml::dump($translations));
+                $output->writeln(sprintf('Translation file "<comment>%s</comment>" was updated successfully.', $translationFile));
+            }
         }
     }
 }

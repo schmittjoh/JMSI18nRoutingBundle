@@ -134,7 +134,7 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $translator->addLoader('yml', new TranslationLoader());
         $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.de.yml'), 'de', 'routes');
         $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en.yml'), 'en', 'routes');
-        $container->set('i18n_loader', new I18nLoader($translator, array('en', 'de', 'fr'), 'routes', sys_get_temp_dir()));
+        $container->set('i18n_loader', new I18nLoader($translator, array('en', 'de', 'fr'), 'en', 'routes', sys_get_temp_dir()));
 
         $router = new I18nRouter($container, $config);
         $router->setI18nLoaderId('i18n_loader');

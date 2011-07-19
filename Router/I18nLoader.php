@@ -31,11 +31,13 @@ class I18nLoader
     private $resolver;
     private $catalogue;
     private $cacheDir;
+    private $defaultLocale;
 
-    public function __construct(TranslatorInterface $translator, array $locales, $catalogue, $cacheDir)
+    public function __construct(TranslatorInterface $translator, array $locales, $defaultLocale, $catalogue, $cacheDir)
     {
         $this->translator = $translator;
         $this->locales = $locales;
+        $this->defaultLocale = $defaultLocale;
         $this->catalogue = $catalogue;
         $this->cacheDir = $cacheDir;
     }
@@ -99,6 +101,11 @@ class I18nLoader
     {
         $nonI18nRoutes = array();
         foreach ($collection->all() as $k => $v) {
+            if (0 === strpos($k, $this->defaultLocale.'_') && null === $collection->get(substr($k, 3))) {
+                $nonI18nRoutes[substr($k, 3)] = $v;
+                continue;
+            }
+
             if ($this->isNotTranslatable($k, $v)) {
                 continue;
             }

@@ -19,14 +19,18 @@
     		<call method="setI18nLoaderId">
     			<argument>jms_i18n_routing.loader</argument>
     		</call>
+    		<call method="setDefaultLocale">
+    		    <argument>%jms_i18n_routing.default_locale%</argument>
+    		</call>
     	</service>
     	
     	<service id="jms_i18n_routing.locale_changing_listener" class="%jms_i18n_routing.locale_changing_listener.class%" public="false" />
     	
     	<service id="jms_i18n_routing.loader" class="%jms_i18n_routing.loader.class%">
     		<argument type="service" id="translator" />
-    		<argument type="collection" /><!-- Supported Locales -->
-    		<argument /><!-- Translation Catalogue -->
+    		<argument>%jms_i18n_routing.locales%</argument>
+    		<argument>%jms_i18n_routing.default_locale%</argument>
+    		<argument>%jms_i18n_routing.catalogue%</argument>
     		<argument>%kernel.cache_dir%</argument>
     	</service>
     </services>
