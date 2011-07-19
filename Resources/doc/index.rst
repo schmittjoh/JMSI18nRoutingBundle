@@ -4,12 +4,12 @@ Overview
 
 This bundle allows you to create i18n routes. Key points:
 
-    - uses the Translation component; translate URLs just like you would translate 
-      any other text on your website
-    - supports different hosts per locale
-    - does not require you to change your development processes
-    - can translate all routes whether they are coming from third-party bundles,
-      or your own application
+- uses the Translation component; translate URLs just like you would translate 
+  any other text on your website
+- supports different hosts per locale
+- does not require you to change your development processes
+- can translate all routes whether they are coming from third-party bundles,
+  or your own application
 
 
 Installation
@@ -75,9 +75,9 @@ Generating Routes
 By default, the router uses the following algorithm to determine which locale to
 use for route generation:
 
-    1. use the _locale parameter which was passed to the generate() method
-    2. use the _locale parameter which is present in the request context
-    3. use the configured default locale
+1. use the _locale parameter which was passed to the generate() method
+2. use the _locale parameter which is present in the request context
+3. use the configured default locale
 
 Some examples below::
 
