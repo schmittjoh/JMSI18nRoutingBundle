@@ -6,7 +6,7 @@ This bundle allows you to create i18n routes. Key points:
 
 - uses the Translation component; translate URLs just like you would translate 
   any other text on your website
-- supports different hosts per locale
+- allows you to use different hosts per locale
 - does not require you to change your development processes
 - can translate all routes whether they are coming from third-party bundles,
   or your own application
@@ -34,7 +34,7 @@ Make sure that you also register the namespaces with the autoloader::
         // ...
         'JMS'              => __DIR__.'/../vendor/bundles',
         // ...
-    ));    
+    ));
 
 
 Configuration
@@ -45,6 +45,9 @@ Below you find a sample configuration that you can use::
         default_locale: en
         locales: [de, en]
         catalogue: routes
+        
+        # If you want to use different hosts per locale (which is not required),
+        # then you can specifiy them here
         hosts:
             en: foo.com
             de: foo.de
