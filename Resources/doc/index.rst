@@ -39,25 +39,82 @@ Make sure that you also register the namespaces with the autoloader::
 
 Configuration
 -------------
-Below you find a sample configuration that you can use::
+The bundle supports three different strategies out-of-the-box to make the
+most common scenarios a bit easier. You can switch between these strategies
+at any time (just make sure to clear the appdevUrl* files in your cache dir).
+
+1. Scenario: Prefixing All Routes With The Locale
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Config::
+
+    jms_i18n_routing:
+        default_locale: en
+        locales: [en, de]
+        strategy: prefix
+
+Resulting URLs::
+
+- /de/kontakt
+- /en/contact
+
+
+2. Scenario: Prefixing All Routes With The Locale except those of the default locale
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Config::
 
     jms_i18n_routing:
         default_locale: en
         locales: [de, en]
-        catalogue: routes
+        strategy: prefix_except_locale
         
-        # If you want to use different hosts per locale (which is not required),
-        # then you can specifiy them here
+Resulting URLs::
+
+- /de/kontakt
+- /contact
+
+3. Scenario: Using different hosts for each locale
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Config::
+
+    jms_i18n_routing:
+        default_locale: en
+        locales: [en, de]
+        strategy: custom
         hosts:
             en: foo.com
-            de: foo.de
+            de: foo.de 
+
+Resulting URLs::
+
+- http://foo.de/kontakt
+- http://foo.com/contact
+
+(URLs will only be absolute when necessary)
+
+4. Scenario: something else
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Config:: 
+
+    jms_i18n_routing:
+        default_locale: en
+        locales: [en, de]
+        strategy: custom
+
+Resulting URLs::
+
+- /kontakt
+- /contact
 
 
 Usage
 -----
 You can continue to create routes like you would do normally. In fact,
 during development you don't need to make any special changes to your existing 
-routes to make them translatable. 
+routes to make them translatable.
 
 Once, you decide that your code is stable enough to begin translation, you can
 use the following command to generate a translation file for you::

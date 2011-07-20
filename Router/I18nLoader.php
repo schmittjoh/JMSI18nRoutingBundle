@@ -28,17 +28,18 @@ class I18nLoader
 {
     private $translator;
     private $locales;
-    private $resolver;
     private $catalogue;
     private $cacheDir;
     private $defaultLocale;
+    private $strategy;
 
-    public function __construct(TranslatorInterface $translator, array $locales, $defaultLocale, $catalogue, $cacheDir)
+    public function __construct(TranslatorInterface $translator, array $locales, $defaultLocale, $catalogue, $strategy, $cacheDir)
     {
         $this->translator = $translator;
         $this->locales = $locales;
         $this->defaultLocale = $defaultLocale;
         $this->catalogue = $catalogue;
+        $this->strategy = $strategy;
         $this->cacheDir = $cacheDir;
     }
 
@@ -77,6 +78,12 @@ class I18nLoader
                     $i18nPattern = $route->getPattern();
                 }
 
+                // prefix with locale if requested
+                if (I18nRouter::STRATEGY_PREFIX === $this->strategy
+                    || (I18nRouter::STRATEGY_PREFIX_EXCEPT_DEFAULT === $this->strategy && $this->defaultLocale !== $locale)) {
+                    $i18nPattern = '/'.$locale.$i18nPattern;
+                }
+
                 if (isset($patterns[$i18nPattern])) {
                     $keepOriginal = true;
                 }
@@ -102,6 +109,11 @@ class I18nLoader
         $nonI18nRoutes = array();
         foreach ($collection->all() as $k => $v) {
             if (0 === strpos($k, $this->defaultLocale.'_') && null === $collection->get(substr($k, 3))) {
+                if (I18nRouter::STRATEGY_PREFIX === $this->strategy) {
+                    $v = clone $v;
+                    $v->setPattern(substr($v->getPattern(), 3));
+                }
+
                 $nonI18nRoutes[substr($k, 3)] = $v;
                 continue;
             }

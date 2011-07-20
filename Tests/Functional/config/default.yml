@@ -2,9 +2,3 @@ imports:
     - { resource: framework.yml }
     - { resource: twig.yml }
 
-jms_i18n_routing:
-    default_locale: en
-    locales: [de, en]
-    hosts:
-        en: en.host
-        de: de.host

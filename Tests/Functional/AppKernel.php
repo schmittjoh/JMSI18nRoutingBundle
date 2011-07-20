@@ -18,6 +18,8 @@
 
 namespace JMS\I18nRoutingBundle\Tests\Functional;
 
+require_once __DIR__.'/../bootstrap.php';
+
 use JMS\I18nRoutingBundle\Exception\RuntimeException;
 use Symfony\Component\HttpKernel\Util\Filesystem;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -62,6 +64,22 @@ class AppKernel extends Kernel
 
     public function getCacheDir()
     {
-        return sys_get_temp_dir().'/JMSI18nRoutingBundle';
+        return sys_get_temp_dir().'/JMSI18nRoutingBundle/cache';
     }
+
+    public function getLogDir()
+    {
+        return sys_get_temp_dir().'/JMSI18nRoutingBundle/logs';
+    }
+
+    public function serialize()
+    {
+        return serialize(array($this->config));
+    }
+
+    public function unserialize($str)
+    {
+        call_user_func_array(array($this, '__construct'), unserialize($str));
+    }
+
 }

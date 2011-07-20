@@ -18,13 +18,14 @@
 
 namespace JMS\I18nRoutingBundle\Tests\Functional;
 
-class SessionIntegrationTest extends BaseTestCase
+class CustomStrategyTest extends BaseTestCase
 {
     public function testDefaultLocaleIsSetCorrectly()
     {
-        $client = $this->createClient(array(), array(
+        $client = $this->createClient(array('config' => 'strategy_custom_with_hosts.yml'), array(
         	'HTTP_HOST' => 'de.host',
         ));
+        $client->insulate();
 
         $crawler = $client->request('GET', '/');
 

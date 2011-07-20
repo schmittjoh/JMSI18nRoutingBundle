@@ -42,10 +42,19 @@ class JMSI18nRoutingExtension extends Extension
         $container->setParameter('jms_i18n_routing.default_locale', $config['default_locale']);
         $container->setParameter('jms_i18n_routing.locales', $config['locales']);
         $container->setParameter('jms_i18n_routing.catalogue', $config['catalogue']);
+        $container->setParameter('jms_i18n_routing.strategy', $config['strategy']);
 
         $this->addClassesToCompile(array(
             $container->getDefinition('jms_i18n_routing.router')->getClass(),
         ));
+
+        if ('prefix' === $config['strategy']) {
+            $container
+                ->getDefinition('jms_i18n_routing.locale_choosing_listener')
+                ->setPublic(true)
+                ->addTag('kernel.event_listener', array('event' => 'kernel.exception', 'priority' => 128))
+            ;
+        }
 
         if ($config['hosts']) {
             $container

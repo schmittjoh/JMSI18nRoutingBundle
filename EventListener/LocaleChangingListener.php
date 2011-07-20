@@ -21,6 +21,13 @@ namespace JMS\I18nRoutingBundle\EventListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
+/**
+ * Sets the locale based on the host which is being accessed.
+ *
+ * This listener is only active if the users specifies a host map.
+ *
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ */
 final class LocaleChangingListener
 {
     private $hostMap;
