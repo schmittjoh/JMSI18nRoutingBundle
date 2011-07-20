@@ -67,7 +67,7 @@ Config::
     jms_i18n_routing:
         default_locale: en
         locales: [de, en]
-        strategy: prefix_except_locale
+        strategy: prefix_except_default
         
 Resulting URLs::
 
