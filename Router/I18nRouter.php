@@ -75,7 +75,7 @@ class I18nRouter extends Router
      *
      * @return string The generated URL
      */
-    public function generate($name, array $parameters = array(), $absolute = false)
+    public function generate($name, $parameters = array(), $absolute = false)
     {
         // determine the most suitable locale to use for route generation
         $currentLocale = $this->context->getParameter('_locale');
