@@ -46,6 +46,7 @@ class RedirectController
         if (null === $scheme) {
             $scheme = $request->getScheme();
         }
+
         $qs = $request->getQueryString();
         if ($qs) {
             $qs = '?'.$qs;
@@ -54,7 +55,7 @@ class RedirectController
         $port = '';
         if ('http' === $scheme && 80 != $httpPort) {
             $port = ':'.$httpPort;
-        } elseif ('https' === $scheme && 443 != $httpPort) {
+        } elseif ('https' === $scheme && 443 != $httpsPort) {
             $port = ':'.$httpsPort;
         }
 
