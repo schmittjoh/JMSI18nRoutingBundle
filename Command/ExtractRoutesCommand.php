@@ -49,7 +49,7 @@ class ExtractRoutesCommand extends ContainerAwareCommand
             $locales = $c->getParameter('jms_i18n_routing.locales');
         }
 
-        $routes = $this->getContainer()->get('jms_i18n_routing.loader')->extract($c->get('router')->getRouteCollection());
+        $routes = $c->get('jms_i18n_routing.loader')->extract($c->get('router')->getRouteCollection());
         $output->writeln(sprintf('<comment>%d</comment> routes found which are eligible for i18n.', count($routes)));
 
         foreach ($locales as $locale) {
