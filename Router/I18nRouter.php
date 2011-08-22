@@ -32,6 +32,7 @@ class I18nRouter extends Router
 {
     const STRATEGY_PREFIX = 'prefix';
     const STRATEGY_PREFIX_EXCEPT_DEFAULT = 'prefix_except_default';
+    const STRATEGY_PREFIX_DEFAULT_BOTH = 'prefix_default_both';
     const STRATEGY_CUSTOM = 'custom';
 
     private $hostMap = array();
