@@ -12,7 +12,7 @@
         <parameter key="jms_i18n_routing.locale_changing_listener.class">JMS\I18nRoutingBundle\EventListener\LocaleChangingListener</parameter>
         <parameter key="jms_i18n_routing.locale_choosing_listener.class">JMS\I18nRoutingBundle\EventListener\LocaleChoosingListener</parameter>
         
-        <parameter key="jms_i18n_routing.util.route_extractor.class">JMS\I18nRoutingBundle\Util\RouteExtractor</parameter>
+        <parameter key="jms_i18n_routing.route_translation_extractor.class">JMS\I18nRoutingBundle\Translation\RouteTranslationExtractor</parameter>
     </parameters>
 
     <services>
@@ -38,6 +38,12 @@
             <argument>%jms_i18n_routing.catalogue%</argument>
             <argument>%jms_i18n_routing.strategy%</argument>
             <argument>%kernel.cache_dir%</argument>
+        </service>
+        
+        <service id="jms_i18n_routing.route_translation_extractor" class="%jms_i18n_routing.route_translation_extractor.class%" public="false">
+            <argument type="service" id="router" />
+            <argument type="service" id="jms_i18n_routing.loader" />
+            <tag name="jms_translation.extractor" alias="jms_i18n_routing" />
         </service>
     </services>
 </container>

@@ -104,6 +104,12 @@ class I18nLoader
         return $i18nCollection;
     }
 
+    /**
+     * TODO: This should be refactored, it is not strictly related to loading
+     *
+     * @param RouteCollection $collection
+     * @return RouteCollection
+     */
     public function extract(RouteCollection $collection)
     {
         $nonI18nRoutes = array();
@@ -128,6 +134,13 @@ class I18nLoader
         return $nonI18nRoutes;
     }
 
+    /**
+     * TODO: Should be moved to a dedicated service
+     *
+     * @param string $name
+     * @param Route $route
+     * @return boolean
+     */
     private function isNotTranslatable($name, Route $route)
     {
         return false === $route->getOption('i18n')

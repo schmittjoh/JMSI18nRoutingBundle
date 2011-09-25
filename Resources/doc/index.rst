@@ -117,7 +117,13 @@ during development you don't need to make any special changes to your existing
 routes to make them translatable.
 
 Once, you decide that your code is stable enough to begin translation, you can
-use the following command to generate a translation file for you::
+use one of the following options to generate a translation file:
+
+1. Using the extraction command provided by this bundle
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+For ease of use, this bundle already provides a rudimentary command for generating 
+a translation file (it has some limitations, but it might be enough if you just 
+want to try this bundle):: 
 
     php app/console i18n:extract-routes <locale>
 
@@ -129,6 +135,21 @@ use the following command to generate a translation file for you::
 
 You can then start translating your routes in the generated file, or pass the 
 translation file on to a translator.
+
+2. Using the extraction command provided by the JMSTranslationBundle
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This bundle is also integrated with the JMSTranslationBundle_ which provides several
+more features like dumping to different formats, retaining the source translation in
+the translation file, and some more. If you have the bundle installed you can
+extract translations with this command:
+
+    php app/console translation:extract de --enable-extractor=jms_i18n_routing ...
+    
+Please refer to the `bundle's documentation`_ for more information.
+
+.. _JMSTranslationBundle: https://github.com/schmittjoh/JMSTranslationBundle
+.. _bundle's documentation: https://github.com/schmittjoh/JMSTranslationBundle/blob/master/Resources/doc/index.rst
+
 
 Generating Routes
 -----------------

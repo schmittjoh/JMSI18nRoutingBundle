@@ -74,6 +74,12 @@ class JMSI18nRoutingExtension extends Extension
                 $container->getDefinition('jms_i18n_routing.locale_changing_listener')->getClass(),
             ));
         }
+
+        // remove route extractor if JMSTranslationBundle is not enabled to avoid any problems
+        $bundles = $container->getParameter('kernel.bundles');
+        if (!isset($bundles['JMSTranslationBundle'])) {
+            $container->removeDefinition('jms_i18n_routing.route_translation_extractor');
+        }
     }
 
     public function getAlias()
