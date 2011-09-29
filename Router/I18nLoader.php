@@ -129,10 +129,11 @@ class I18nLoader
         return $nonI18nRoutes;
     }
 
-    public function setIgnoredRoutes(array $patterns) {
+    public function setIgnoredRoutes(array $patterns)
+    {
         $this->ignoredRoutes = array_map(
             function ($pattern) {
-                return '#'.$pattern.'#';
+                return '#'.str_replace('#', '\\#', $pattern).'#';
             }, 
             $patterns
         );
