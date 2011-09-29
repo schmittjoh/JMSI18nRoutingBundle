@@ -32,6 +32,7 @@ class I18nLoader
     private $cacheDir;
     private $defaultLocale;
     private $strategy;
+    private $ignoredRoutes = array();
 
     public function __construct(TranslatorInterface $translator, array $locales, $defaultLocale, $catalogue, $strategy, $cacheDir)
     {
@@ -128,10 +129,20 @@ class I18nLoader
         return $nonI18nRoutes;
     }
 
+    public function setIgnoredRoutes(array $patterns) {
+        $this->ignoredRoutes = array_map(
+            function ($pattern) {
+                return '#'.$pattern.'#';
+            }, 
+            $patterns
+        );
+    }
+
     private function isNotTranslatable($name, Route $route)
     {
         return false === $route->getOption('i18n')
                || preg_match('/^(?:_|[a-z]{2}_)/', $name) > 0
+               || null !== preg_filter($this->ignoredRoutes, array(), $name, 1)
         ;
     }
 }

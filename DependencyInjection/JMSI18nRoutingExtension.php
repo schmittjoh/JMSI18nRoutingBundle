@@ -74,6 +74,13 @@ class JMSI18nRoutingExtension extends Extension
                 $container->getDefinition('jms_i18n_routing.locale_changing_listener')->getClass(),
             ));
         }
+
+        if ($config['ignore_routes']) {
+            $container
+                ->getDefinition('jms_i18n_routing.loader')
+                ->addMethodCall('setIgnoredRoutes', array($config['ignore_routes']))
+            ;
+        }
     }
 
     public function getAlias()
