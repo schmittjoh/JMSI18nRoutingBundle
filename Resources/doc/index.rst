@@ -36,7 +36,7 @@ Make sure that you also register the namespaces with the autoloader::
         // ...
     ));
 
-Also ensure that you have the Translator enabled::
+Also, check that you have enabled the Translator::
 
     # app/config/config.yml
     framework:
