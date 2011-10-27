@@ -98,7 +98,7 @@ class I18nRouter extends Router
         // skip internal routes
         if ('_' !== $name[0]) {
             // if an absolute URL is requested, we set the correct host
-            if ($this->hostMap) {
+            if ($absolute && $this->hostMap) {
                 $currentHost = $this->context->getHost();
                 $this->context->setHost($this->hostMap[$locale]);
             }
@@ -106,13 +106,13 @@ class I18nRouter extends Router
             try {
                 $url = $generator->generate($locale.'_'.$name, $parameters, $absolute);
 
-                if ($this->hostMap) {
+                if ($absolute && $this->hostMap) {
                     $this->context->setHost($currentHost);
                 }
 
                 return $url;
             } catch (RouteNotFoundException $ex) {
-                if ($this->hostMap) {
+                if ($absolute && $this->hostMap) {
                     $this->context->setHost($currentHost);
                 }
 
@@ -126,7 +126,7 @@ class I18nRouter extends Router
 
     /**
      * Tries to match a URL with a set of routes.
-	 *
+     *
      * Returns false if no route matches the URL.
      *
      * @param  string $url URL to be parsed
