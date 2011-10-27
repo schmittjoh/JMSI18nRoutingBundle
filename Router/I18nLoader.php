@@ -79,12 +79,12 @@ class I18nLoader
                 }
 
                 // prefix with locale if requested
-                if (I18nRouter::STRATEGY_PREFIX === $this->strategy
+                if (I18nRouter::STRATEGY_PREFIX === $this->strategy || I18nRouter::STRATEGY_PREFIX_DEFAULT_BOTH === $this->strategy
                     || (I18nRouter::STRATEGY_PREFIX_EXCEPT_DEFAULT === $this->strategy && $this->defaultLocale !== $locale)) {
                     $i18nPattern = '/'.$locale.$i18nPattern;
                 }
 
-                if (isset($patterns[$i18nPattern])) {
+                if (isset($patterns[$i18nPattern]) || I18nRouter::STRATEGY_PREFIX_DEFAULT_BOTH === $this->strategy) {
                     $keepOriginal = true;
                 }
                 $patterns[$i18nPattern] = true;
@@ -92,9 +92,13 @@ class I18nLoader
                 $i18nRoute->setPattern($i18nPattern);
                 $i18nRoute->setDefault('_locale', $locale);
                 $translations->add($locale.'_'.$name, $i18nRoute);
+
             }
 
             if ($keepOriginal || $route->getOption('i18n_keep')) {
+                if (I18nRouter::STRATEGY_PREFIX_DEFAULT_BOTH === $this->strategy) {
+                    $route->setDefault('_locale', $locale);
+                }
                 $i18nCollection->add($name, $route);
             }
 

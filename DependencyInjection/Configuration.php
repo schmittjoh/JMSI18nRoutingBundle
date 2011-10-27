@@ -69,7 +69,7 @@ final class Configuration implements ConfigurationInterface
                     ->scalarNode('strategy')
                         ->defaultValue('custom')
                         ->validate()
-                            ->ifNotInArray(array('prefix', 'prefix_except_default', 'custom'))
+                            ->ifNotInArray(array('prefix', 'prefix_except_default', 'custom', 'prefix_default_both'))
                             ->thenInvalid('Must be one of the following: prefix, prefix_except_default, or custom (default)')
                         ->end()
                     ->end()
