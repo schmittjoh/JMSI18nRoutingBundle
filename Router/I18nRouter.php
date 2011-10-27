@@ -106,13 +106,13 @@ class I18nRouter extends Router
             try {
                 $url = $generator->generate($locale.'_'.$name, $parameters, $absolute);
 
-                if ($this->hostMap) {
+                if ($absolute && $this->hostMap) {
                     $this->context->setHost($currentHost);
                 }
 
                 return $url;
             } catch (RouteNotFoundException $ex) {
-                if ($this->hostMap) {
+                if ($absolute && $this->hostMap) {
                     $this->context->setHost($currentHost);
                 }
 
