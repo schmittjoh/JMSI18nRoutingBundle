@@ -141,6 +141,30 @@ want to try this bundle)::
 You can then start translating your routes in the generated file, or pass the 
 translation file on to a translator.
 
+The generated file with translations for the routes will be placed at app/Resources/translations/routes.XX.yml
+(one file per each locale defined in config, where XX is the locale code) and will look like this::
+
+    #filename: app/Resources/translations/routes.es.yml
+    home: /
+    search_list: '/lista/{city}'
+
+for a routing.yml like this::
+
+    #filename: src\Acme\DemoBundle\Resources\config
+    home:
+        pattern:  /
+        defaults: { _controller: AcmeDemoBundle:Home:index }
+
+    search_list:
+        pattern:  /list/{city}
+        defaults: { _controller: AcmeDemoBundle:List:list }
+    
+    _robotstxt
+        pattern:  /robots.txt
+        defaults: { _controller: AcmeDemoBundle:Robots:txt }
+
+Take into account that all routes which name begins with "_" will be ignored (like _robotstxt in the example ).
+
 2. Using the extraction command provided by the JMSTranslationBundle
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This bundle is also integrated with the JMSTranslationBundle_ which provides several
