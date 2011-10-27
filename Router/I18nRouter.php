@@ -98,7 +98,7 @@ class I18nRouter extends Router
         // skip internal routes
         if ('_' !== $name[0]) {
             // if an absolute URL is requested, we set the correct host
-            if ($absolute) {
+            if ($absolute && $this->hostMap) {
                 $currentHost = $this->context->getHost();
                 $this->context->setHost($this->hostMap[$locale]);
             }
