@@ -82,6 +82,7 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         ));
 
         $context = new RequestContext();
+        $context->setHost('en.test');
         $context->setScheme('http');
         $context->setParameter('_locale', 'en');
         $router->setContext($context);

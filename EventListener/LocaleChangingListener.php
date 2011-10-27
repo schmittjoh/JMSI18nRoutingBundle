@@ -43,10 +43,15 @@ final class LocaleChangingListener
             return;
         }
 
-        $host = $event->getRequest()->getHost();
+        $request = $event->getRequest();
+        $host = $request->getHost();
 
         if (isset($this->hostMap[$host])) {
-            $event->getRequest()->getSession()->setLocale($this->hostMap[$host]);
+            if (method_exists($request, 'setLocale')) {
+                $request->setLocale($this->hostMap[$host]);
+            } else {
+                $request->getSession()->setLocale($this->hostMap[$host]);
+            }
         }
     }
 }

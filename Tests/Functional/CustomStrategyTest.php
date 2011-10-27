@@ -29,6 +29,7 @@ class CustomStrategyTest extends BaseTestCase
 
         $crawler = $client->request('GET', '/');
 
-        $this->assertEquals('de', $crawler->filter('#locale')->text());
+        $this->assertEquals(1, count($locale = $crawler->filter('#locale')), substr($client->getResponse(), 0, 2000));
+        $this->assertEquals('de', $locale->text());
     }
 }

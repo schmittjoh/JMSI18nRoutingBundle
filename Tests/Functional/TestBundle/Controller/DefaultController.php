@@ -18,6 +18,8 @@
 
 namespace JMS\I18nRoutingBundle\Tests\Functional\TestBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -28,8 +30,11 @@ class DefaultController
      * @Route("/")
      * @Template
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
-        return array();
+        $locale = method_exists($request, 'getLocale') ? $request->getLocale()
+            : $request->getSession()->getLocale();
+
+        return array('locale' => $locale);
     }
 }
