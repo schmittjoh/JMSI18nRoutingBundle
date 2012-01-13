@@ -59,7 +59,9 @@ class ExtractRoutesCommand extends ContainerAwareCommand
                 $c->getParameter('jms_i18n_routing.catalogue'),
                 $locale
             );
-            $locale = str_replace('-', '_', $locale);
+            if ($c->getParameter('jms_i18n_routing.seperator') && $c->getParameter('jms_i18n_routing.seperator') !== '_') {
+                $locale = str_replace($c->getParameter('jms_i18n_routing.seperator'), '_', $locale);
+            }
             $translations = file_exists($translationFile) ? Yaml::parse(file_get_contents($translationFile)) : array();
             $output->writeln(sprintf('Locale "<comment>%s</comment>" - <comment>%d</comment> route translations loaded.', $locale, count($translations)));
 

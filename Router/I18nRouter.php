@@ -81,7 +81,9 @@ class I18nRouter extends Router
         $currentLocale = $this->context->getParameter('_locale');
         if (isset($parameters['_locale'])) {
             $locale = $parameters['_locale'];
-            $parameters['_locale'] = str_replace('_', '-', $parameters['_locale']);
+            if ($this->container->getParameter('jms_i18n_routing.seperator') && $this->container->getParameter('jms_i18n_routing.seperator') !== '_') {
+                $parameters['_locale'] = str_replace('_', 'jms_i18n_routing.seperator', $parameters['_locale']);
+            }
         } else if ($currentLocale) {
             $locale = $currentLocale;
         } else {
@@ -104,7 +106,11 @@ class I18nRouter extends Router
             }
 
             try {
-                $url = $generator->generate(str_replace('-', '_',$locale).'_'.$name, $parameters, $absolute);
+                if ($this->container->getParameter('jms_i18n_routing.seperator') && $this->container->getParameter('jms_i18n_routing.seperator') !== '_') {
+                    $locale = str_replace($this->container->getParameter('jms_i18n_routing.seperator'), '_', $locale);
+                }
+
+                $url = $generator->generate($locale.'_'.$name, $parameters, $absolute);
 
                 if ($absolute && $this->hostMap) {
                     $this->context->setHost($currentHost);

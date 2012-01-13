@@ -32,8 +32,9 @@ class I18nLoader
     private $cacheDir;
     private $defaultLocale;
     private $strategy;
+    private $seperator;
 
-    public function __construct(TranslatorInterface $translator, array $locales, $defaultLocale, $catalogue, $strategy, $cacheDir)
+    public function __construct(TranslatorInterface $translator, array $locales, $defaultLocale, $catalogue, $strategy, $cacheDir, $seperator)
     {
         $this->translator = $translator;
         $this->locales = $locales;
@@ -41,6 +42,7 @@ class I18nLoader
         $this->catalogue = $catalogue;
         $this->strategy = $strategy;
         $this->cacheDir = $cacheDir;
+        $this->seperator = $seperator;
     }
 
     public function load(RouteCollection $collection)
@@ -90,7 +92,11 @@ class I18nLoader
                 $patterns[$i18nPattern] = true;
 
                 $i18nRoute->setPattern($i18nPattern);
-                $locale = str_replace('-', '_', $locale);
+
+                if ($this->seperator && $this->seperator !== '_') {
+                    $locale = str_replace($this->seperator, '_', $locale);
+                }
+
                 $i18nRoute->setDefault('_locale', $locale);
                 $translations->add($locale.'_'.$name, $i18nRoute);
             }
@@ -114,14 +120,23 @@ class I18nLoader
     public function extract(RouteCollection $collection)
     {
         $nonI18nRoutes = array();
+
+        $default = $this->defaultLocale;
+
+        if ($this->seperator && $this->seperator !== '_') {
+            $default = str_replace($this->seperator, '_', $default);
+        }
+
+        $subStrLength = strlen($default) + 1;
+
         foreach ($collection->all() as $k => $v) {
-            if (0 === strpos($k, str_replace('-', '_', $this->defaultLocale).'_') && null === $collection->get(substr($k, 3))) {
+            if (0 === strpos($k, $default.'_') && null === $collection->get(substr($k, $subStrLength))) {
                 if (I18nRouter::STRATEGY_PREFIX === $this->strategy) {
                     $v = clone $v;
-                    $v->setPattern(substr($v->getPattern(), 3));
+                    $v->setPattern(substr($v->getPattern(), $subStrLength));
                 }
 
-                $nonI18nRoutes[substr($k, 3)] = $v;
+                $nonI18nRoutes[substr($k, $subStrLength)] = $v;
                 continue;
             }
 
