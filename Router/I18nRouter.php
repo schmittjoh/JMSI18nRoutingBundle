@@ -81,12 +81,12 @@ class I18nRouter extends Router
         $currentLocale = $this->context->getParameter('_locale');
         if (isset($parameters['_locale'])) {
             $locale = $parameters['_locale'];
+            $parameters['_locale'] = str_replace('_', '-', $parameters['_locale']);
         } else if ($currentLocale) {
             $locale = $currentLocale;
         } else {
             $locale = $this->defaultLocale;
         }
-
         // if the locale is changed, and we have a host map, then we need to
         // generate an absolute URL
         if ($currentLocale && $currentLocale !== $locale && $this->hostMap) {
@@ -104,7 +104,7 @@ class I18nRouter extends Router
             }
 
             try {
-                $url = $generator->generate($locale.'_'.$name, $parameters, $absolute);
+                $url = $generator->generate(str_replace('-', '_',$locale).'_'.$name, $parameters, $absolute);
 
                 if ($absolute && $this->hostMap) {
                     $this->context->setHost($currentHost);

@@ -90,6 +90,7 @@ class I18nLoader
                 $patterns[$i18nPattern] = true;
 
                 $i18nRoute->setPattern($i18nPattern);
+                $locale = str_replace('-', '_', $locale);
                 $i18nRoute->setDefault('_locale', $locale);
                 $translations->add($locale.'_'.$name, $i18nRoute);
             }
@@ -114,7 +115,7 @@ class I18nLoader
     {
         $nonI18nRoutes = array();
         foreach ($collection->all() as $k => $v) {
-            if (0 === strpos($k, $this->defaultLocale.'_') && null === $collection->get(substr($k, 3))) {
+            if (0 === strpos($k, str_replace('-', '_', $this->defaultLocale).'_') && null === $collection->get(substr($k, 3))) {
                 if (I18nRouter::STRATEGY_PREFIX === $this->strategy) {
                     $v = clone $v;
                     $v->setPattern(substr($v->getPattern(), 3));

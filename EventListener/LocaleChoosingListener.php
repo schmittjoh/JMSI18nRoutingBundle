@@ -47,6 +47,13 @@ class LocaleChoosingListener
             return;
         }
 
-        $event->setResponse(new RedirectResponse($request->getBaseUrl().'/'.$request->getPreferredLanguage(array_merge(array($this->defaultLocale), $this->locales)).$request->getPathInfo()));
+        foreach ($this->locales as $locale) {
+            $locale = explode('-', $locale);
+            $tmp[] = $locale[0].'_'.strtoupper($locale[1]);
+        }
+
+        $lang = $request->getPreferredLanguage(array_merge(array($this->defaultLocale), $tmp));
+        $lang = strtolower(str_replace('_', '-', $lang));
+        $event->setResponse(new RedirectResponse($request->getBaseUrl().'/'.$lang.$request->getPathInfo()));
     }
 }
