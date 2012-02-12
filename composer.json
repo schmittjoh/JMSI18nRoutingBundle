@@ -13,6 +13,9 @@
     "require": {
         "symfony/framework-bundle": "2.*",
     },
+    "suggest": {
+        "jms/translation-bundle": "*"
+    },
     "autoload": {
         "psr-0": { "JMS\\I18nRoutingBundle": "" }
     },
