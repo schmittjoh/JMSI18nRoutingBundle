@@ -31,5 +31,10 @@ class SetRouterPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $container->setAlias('router', 'jms_i18n_routing.router');
+
+        $translatorDef = $container->findDefinition('translator');
+        if ('%translator.identity.class%' === $translatorDef->getClass()) {
+            throw new \RuntimeException('The JMSI18nRoutingBundle requires Symfony2\'s translator to be enabled. Please make sure to un-comment the respective section in the framework config.');
+        }
     }
 }
