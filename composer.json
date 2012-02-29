@@ -1,0 +1,23 @@
+{
+    "name":         "jms/i18n-routing-bundle",
+    "description":  "This bundle allows you to create i18n routes.",
+    "keywords":     ["translation","multilanguage","routing"],
+    "type":         "symfony-bundle",
+    "license":      "Apache",
+    "authors": [
+        {
+            "name":   "Johannes M. Schmitt",
+            "email":  "schmittjoh@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/framework-bundle": "2.*",
+    },
+    "suggest": {
+        "jms/translation-bundle": "*"
+    },
+    "autoload": {
+        "psr-0": { "JMS\\I18nRoutingBundle": "" }
+    },
+    "target-dir": "JMS/I18nRoutingBundle"
+}
