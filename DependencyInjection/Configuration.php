@@ -89,6 +89,8 @@ final class Configuration implements ConfigurationInterface
                         ->useAttributeAsKey('locale')
                         ->prototype('scalar')->end()
                     ->end()
+                    ->booleanNode('use_seperator')->defaultFalse()->end()
+                    ->scalarNode('seperator')->defaultValue('-')->end()
                 ->end()
             ->end()
         ;

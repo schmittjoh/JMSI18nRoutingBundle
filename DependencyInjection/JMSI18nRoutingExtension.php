@@ -44,6 +44,12 @@ class JMSI18nRoutingExtension extends Extension
         $container->setParameter('jms_i18n_routing.catalogue', $config['catalogue']);
         $container->setParameter('jms_i18n_routing.strategy', $config['strategy']);
 
+        if ($config['use_seperator']) {
+            $container->setParameter('jms_i18n_routing.seperator', $config['seperator']);
+        } else {
+            $container->setParameter('jms_i18n_routing.seperator', false);
+        }
+
         $this->addClassesToCompile(array(
             $container->getDefinition('jms_i18n_routing.router')->getClass(),
         ));

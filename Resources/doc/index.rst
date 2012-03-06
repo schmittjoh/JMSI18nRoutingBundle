@@ -114,6 +114,27 @@ Resulting URLs::
 - /kontakt
 - /contact
 
+5. Scenario: Using With Locale-Country Combination
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Config::
+
+    jms_i18n_routing:
+        default_locale: en-us
+        locales: [en-us, de-de, de-ch]
+        strategy: custom
+        use_seperator: true #default false
+        seperator: - #default -
+
+Resulting URLs::
+
+- de-de/kontakt
+- de-ch/kontakt
+- en-us/contact
+
+If you using a seperator like "-" the locale in the session and the locale used for generate routes are always xx_yy.
+This is for the UrlMatcher which generates functions like xx_yy_routeName and "-" are not allowed in function names.
+
 
 Usage
 -----
@@ -198,6 +219,11 @@ Some examples below::
          of the request context, then you can pass it explicitly -->
     <a href="{{ path("homepage", {"_locale": "de"}) }}">Deutsch</a>
     <a href="{{ path("homepage", {"_locale": "en"}) }}">English</a>
+
+    <!-- using seperator like "-" -->
+    <a href="{{ path("homepage", {"_locale": "de_de"}) }}">Deutschland</a>
+    <a href="{{ path("homepage", {"_locale": "de_ch"}) }}">Schweiz</a>
+    <a href="{{ path("homepage", {"_locale": "en_us"}) }}">USA</a>
 
 Other Resources
 ---------------
