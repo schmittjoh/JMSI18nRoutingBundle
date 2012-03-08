@@ -46,13 +46,16 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('en', $en->getDefault('_locale'));
     }
 
-    public function testLoadDoesNotRemoveOriginalIfNotAllRoutesHaveTranslations()
+    /**
+     * @dataProvider getRedirectAndCollectionCount
+     */
+    public function testLoadDoesNotRemoveOriginalIfNotAllRoutesHaveTranslationsUnlessRedirectIsOff($redirectToHost, $collectionCount)
     {
         $col = new RouteCollection();
         $col->add('support', new Route('/support'));
-        $i18nCol = $this->getLoader()->load($col);
+        $i18nCol = $this->getLoader(I18nRouter::STRATEGY_CUSTOM, $redirectToHost)->load($col);
 
-        $this->assertEquals(3, count($i18nCol->all()));
+        $this->assertEquals($collectionCount, count($i18nCol->all()));
 
         $de = $i18nCol->get('de_support');
         $this->assertEquals('/support', $de->getPattern());
@@ -146,13 +149,20 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
         return array(array('custom'), array('prefix'), array('prefix_except_default'));
     }
 
-    private function getLoader($strategy = I18nRouter::STRATEGY_CUSTOM)
+    private function getLoader($strategy = I18nRouter::STRATEGY_CUSTOM, $redirectToHost = true)
     {
         $translator = new Translator('en', new MessageSelector());
         $translator->addLoader('yml', new YamlFileLoader());
         $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.de.yml'), 'de', 'routes');
         $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en.yml'), 'en', 'routes');
 
-        return new I18nLoader($translator, array('en', 'de'), 'en', 'routes', $strategy, sys_get_temp_dir());
+        return new I18nLoader($translator, array('en', 'de'), 'en', 'routes', $strategy, sys_get_temp_dir(), $redirectToHost);
+    }
+    public function getRedirectAndCollectionCount()
+    {
+        return array(
+            array(true, 3),
+            array(false, 2),
+        );
     }
 }

@@ -38,6 +38,7 @@
             <argument>%jms_i18n_routing.catalogue%</argument>
             <argument>%jms_i18n_routing.strategy%</argument>
             <argument>%kernel.cache_dir%</argument>
+            <argument>%jms_i18n_routing.redirect_to_host%</argument>
         </service>
         
         <service id="jms_i18n_routing.route_translation_extractor" class="%jms_i18n_routing.route_translation_extractor.class%" public="false">
