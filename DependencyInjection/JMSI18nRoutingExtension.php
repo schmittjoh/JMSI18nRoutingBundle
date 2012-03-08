@@ -43,6 +43,7 @@ class JMSI18nRoutingExtension extends Extension
         $container->setParameter('jms_i18n_routing.locales', $config['locales']);
         $container->setParameter('jms_i18n_routing.catalogue', $config['catalogue']);
         $container->setParameter('jms_i18n_routing.strategy', $config['strategy']);
+        $container->setParameter('jms_i18n_routing.redirect_to_host', $config['redirect_to_host']);
 
         $this->addClassesToCompile(array(
             $container->getDefinition('jms_i18n_routing.router')->getClass(),

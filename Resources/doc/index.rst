@@ -80,7 +80,10 @@ Resulting URLs::
 - /contact
 
 3. Scenario: Using different hosts for each locale
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   Whenever a pattern is matched to a different host's locale a redirect
+   is used, unless redirect_to_host = false, in which case a
+   ResourceNotFoundException is thrown
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Config::
 
@@ -91,6 +94,7 @@ Config::
         hosts:
             en: foo.com
             de: foo.de 
+        redirect_to_host: true/false
 
 Resulting URLs::
 

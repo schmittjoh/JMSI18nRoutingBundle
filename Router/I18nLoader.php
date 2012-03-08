@@ -32,8 +32,9 @@ class I18nLoader
     private $cacheDir;
     private $defaultLocale;
     private $strategy;
+    private $redirectToHost;
 
-    public function __construct(TranslatorInterface $translator, array $locales, $defaultLocale, $catalogue, $strategy, $cacheDir)
+    public function __construct(TranslatorInterface $translator, array $locales, $defaultLocale, $catalogue, $strategy, $cacheDir, $redirectToHost = true)
     {
         $this->translator = $translator;
         $this->locales = $locales;
@@ -41,6 +42,7 @@ class I18nLoader
         $this->catalogue = $catalogue;
         $this->strategy = $strategy;
         $this->cacheDir = $cacheDir;
+        $this->redirectToHost = $redirectToHost;
     }
 
     public function load(RouteCollection $collection)
@@ -94,7 +96,10 @@ class I18nLoader
                 $translations->add($locale.'_'.$name, $i18nRoute);
             }
 
-            if ($keepOriginal || $route->getOption('i18n_keep')) {
+            // The original route is NOT needed (actually not wanted) when redirectToHost is set. 
+            // By not keeping the original it becomes possible to distinguish between routes 
+            // not available for the active locale and untranslatable routes $route->getOption('i18n'))
+            if (($keepOriginal || $route->getOption('i18n_keep')) && $this->redirectToHost ) {
                 $i18nCollection->add($name, $route);
             }
 

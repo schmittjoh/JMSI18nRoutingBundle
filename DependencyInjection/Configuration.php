@@ -89,6 +89,7 @@ final class Configuration implements ConfigurationInterface
                         ->useAttributeAsKey('locale')
                         ->prototype('scalar')->end()
                     ->end()
+                    ->booleanNode('redirect_to_host')->defaultTrue()->end()
                 ->end()
             ->end()
         ;
