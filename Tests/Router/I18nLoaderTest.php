@@ -158,6 +158,7 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
 
         return new I18nLoader($translator, array('en', 'de'), 'en', 'routes', $strategy, sys_get_temp_dir(), $redirectToHost);
     }
+
     public function getRedirectAndCollectionCount()
     {
         return array(
