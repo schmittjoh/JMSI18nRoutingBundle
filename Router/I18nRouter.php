@@ -191,9 +191,9 @@ class I18nRouter extends Router
         return $this->container->get($this->i18nLoaderId)->load($collection);
     }
 
-
     /**
      * Generates the route matching $params, but for the active locale
+     *
      * @param array $params The params required for generating a route
      *
      * @return string The route corresponding $params for the active locale

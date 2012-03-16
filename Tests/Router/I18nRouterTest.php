@@ -152,7 +152,6 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $container->setParameter('jms_i18n_routing.redirect_to_host', $redirectToHost);
 
         $router = new I18nRouter($container, $config);
-
         $router->setI18nLoaderId('i18n_loader');
         $router->setDefaultLocale('en');
 
@@ -256,6 +255,7 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
     {
         try {
             $router->generate($routeName);
+
             return false;
         }
         catch (RouteNotFoundException $e) {
@@ -275,6 +275,7 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
     {
         try {
             $router->match($pattern);
+
             return false;
         }
         catch (ResourceNotFoundException $e) {
