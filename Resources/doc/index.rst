@@ -83,7 +83,7 @@ Resulting URLs::
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Whenever a pattern is matched to a different host's locale a redirect
 is used, unless redirect_to_host = false, in which case a
-ResourceNotFoundException is thrown
+ResourceNotFoundException is thrown (resulting in a 404 error)
 
 Config::
 
