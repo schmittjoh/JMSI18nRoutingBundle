@@ -135,6 +135,105 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         ), $router->match('/willkommen-auf-unserer-webseite'));
     }
 
+    public function testRouteNotFoundForActiveLocale()
+    {
+        $router = $this->getNonRedirectingHostMapRouter();
+        $context = new RequestContext();
+        $context->setParameter('_locale', 'en_US');
+        $context->setHost('us.test');
+        $router->setContext($context);
+
+        // The route should be available for both en_UK and en_US
+        $this->assertEquals(array('_route' => 'news_overview', '_locale' => 'en_US'), $router->match('/news'));
+
+        $context->setParameter('_locale', 'en_UK');
+        $context->setHost('uk.test');
+        $router->setContext($context);
+
+        // The route should be available for both en_UK and en_US
+        $this->assertEquals(array('_route' => 'news_overview', '_locale' => 'en_UK'), $router->match('/news'));
+
+        // Tests whether generating a route to a different locale works
+        $this->assertEquals('http://nl.test/nieuws', $router->generate('news_overview', array('_locale' => 'nl_NL')));
+
+        $this->assertEquals(array('_route' => 'english_only', '_locale' => 'en_UK'), $router->match('/english-only'));
+    }
+
+    /**
+     * Tests whether sublocales are properly translated (en_UK and en_US can use different patterns)
+     */
+    public function testSubLocaleTranslation()
+    {
+        // Note that the default is set to en_UK by getDoubleLocaleRouter()
+        $router = $this->getNonRedirectingHostMapRouter();
+        $context = new RequestContext();
+        $context->setParameter('_locale', 'en_US');
+        $context->setHost('us.test');
+        $router->setContext($context);
+
+        // Test overwrite
+        $this->assertEquals(array('_route' => 'sub_locale', '_locale' => 'en_US'), $router->match('/american'));
+
+        $context->setParameter('_locale', 'en_UK');
+        $context->setHost('uk.test');
+        $router->setContext($context);
+        $this->assertEquals(array('_route' => 'enUK_only', '_locale' => 'en_UK'), $router->match('/enUK-only'));
+    }
+
+    /**
+     * @dataProvider getMatchThrowsExceptionFixtures
+     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testMatchThrowsException($locale, $host, $pattern)
+    {
+        $router = $this->getNonRedirectingHostMapRouter();
+        $context = new RequestContext();
+        $context->setParameter('_locale', $locale);
+        $context->setHost($host);
+        $router->setContext($context);
+
+        $router->match($pattern);
+    }
+
+    /**
+     * @dataProvider getGenerateThrowsExceptionFixtures
+     * @expectedException Symfony\Component\Routing\Exception\RouteNotFoundException
+     */
+    public function testGenerateThrowsException($locale, $host, $route)
+    {
+        $router = $this->getNonRedirectingHostMapRouter();
+        $context = new RequestContext();
+        $context->setParameter('_locale', $locale);
+        $context->setHost($host);
+        $router->setContext($context);
+
+        $router->generate($route);
+    }
+
+    /**
+     * DataProvider used by testMatchThrowsException
+     */
+    public function getMatchThrowsExceptionFixtures()
+    {
+        return array(
+            array('en_UK', 'uk.tests', '/nieuws'),
+            array('en_UK', 'uk.tests', '/dutch_only'),
+            array('en_US', 'us.tests', '/enUK-only'),
+            array('en_US', 'us.tests', '/english'),
+        );
+    }
+
+    /**
+     * DataProvider used by testGenerateThrowsException
+     */
+    public function getGenerateThrowsExceptionFixtures()
+    {
+        return array(
+            array('en_UK', 'uk.tests', 'dutch_only'),
+            array('en_US', 'us.tests', 'enUK_only'),
+        );
+    }
+
     private function getRouter($config = 'routing.yml', $translator = null, $redirectToHost = true)
     {
         $container = new Container();
@@ -187,99 +286,5 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         ));
 
         return $router;
-    }
-
-    public function testRouteNotFoundForActiveLocale()
-    {
-        $router = $this->getNonRedirectingHostMapRouter();
-        $context = new RequestContext();
-        $context->setParameter('_locale', 'en_US');
-        $context->setHost('us.test');
-        $router->setContext($context);
-
-        // The route should be available for both en_UK and en_US
-        $this->assertEquals(array('_route' => 'news_overview', '_locale' => 'en_US'), $router->match('/news'));
-
-        $context->setParameter('_locale', 'en_UK');
-        $context->setHost('uk.test');
-        $router->setContext($context);
-
-        // The route should be available for both en_UK and en_US
-        $this->assertEquals(array('_route' => 'news_overview', '_locale' => 'en_UK'), $router->match('/news'));
-
-        // Tests whether generating a route to a different locale works
-        $this->assertEquals('http://nl.test/nieuws', $router->generate('news_overview', array('_locale' => 'nl_NL')));
-
-        // en_UK is active. The route corresponding nl_NL / nl_BE should cause a ResourceNotFoundException
-        $this->assertTrue($this->matchThrowsResourceNotFoundException($router, '/nieuws'));
-
-        $this->assertEquals(array('_route' => 'english_only', '_locale' => 'en_UK'), $router->match('/english-only'));
-
-        // Check whether the matcher and generater both provide the same ResourceNotFoundException / RouteNotFoundException behaviour
-        $this->assertTrue($this->matchThrowsResourceNotFoundException($router, '/dutch-only'));
-        $this->assertTrue($this->generateThrowsRouteNotFoundException($router, 'dutch_only'));
-    }
-
-    public function testSubLocaleTranslation()
-    {
-        // Note that the default is set to en_UK by getDoubleLocaleRouter()
-        $router = $this->getNonRedirectingHostMapRouter();
-        $context = new RequestContext();
-        $context->setParameter('_locale', 'en_US');
-        $context->setHost('us.test');
-        $router->setContext($context);
-
-        // enUK-only isn't available for en_US
-        $this->assertTrue($this->matchThrowsResourceNotFoundException($router, '/enUk-only'));
-        $this->assertTrue($this->generateThrowsRouteNotFoundException($router, 'enUk_only'));
-
-        // Test overwrite
-        $this->assertEquals(array('_route' => 'sub_locale', '_locale' => 'en_US'), $router->match('/american'));
-        $this->assertTrue($this->matchThrowsResourceNotFoundException($router, '/english'));
-
-        $context->setParameter('_locale', 'en_UK');
-        $context->setHost('uk.test');
-        $router->setContext($context);
-        $this->assertEquals(array('_route' => 'enUK_only', '_locale' => 'en_UK'), $router->match('/enUK-only'));
-    }
-
-    /**
-     * Generates the route for $routeName
-     *
-     * @param I18nRouter $router The router
-     * @param string $routeName The name of the route
-     *
-     * @return Returns true if the generate caused a RouteNotFoundException, else false
-     */
-    protected function generateThrowsRouteNotFoundException(I18nRouter $router, $routeName)
-    {
-        try {
-            $router->generate($routeName);
-
-            return false;
-        }
-        catch (RouteNotFoundException $e) {
-            return true;
-        }
-    }
-
-    /**
-     * Matches the url for $pattern
-     *
-     * @param I18nRouter $router The router
-     * @param string $pattern The pattern to match
-     *
-     * @return Returns true if the match caused a ResourceNotFoundException, else false
-     */
-    protected function matchThrowsResourceNotFoundException(I18nRouter $router, $pattern)
-    {
-        try {
-            $router->match($pattern);
-
-            return false;
-        }
-        catch (ResourceNotFoundException $e) {
-            return true;
-        }
     }
 }
