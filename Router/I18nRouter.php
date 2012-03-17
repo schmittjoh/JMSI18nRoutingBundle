@@ -22,6 +22,7 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
  * I18n Router implementation.
@@ -137,20 +138,43 @@ class I18nRouter extends Router
     {
         $params = $this->getMatcher()->match($url);
 
-        // check if a host change is required
+        // check if a host change or RouteNotFoundException is required
         if (false !== $params && isset($params['_locale'])
             && isset($this->hostMap[$params['_locale']])
             && $this->context->getHost() !== $host = $this->hostMap[$params['_locale']]) {
-            return array(
-                '_controller' => 'JMS\I18nRoutingBundle\Controller\RedirectController::redirectAction',
-                'path'        => $url,
-                'host'        => $host,
-                'permanent'   => true,
-                'scheme'      => $this->context->getScheme(),
-                'httpPort'    => $this->context->getHttpPort(),
-                'httpsPort'   => $this->context->getHttpsPort(),
-                '_route'      => substr($params['_route'], strlen($params['_locale'])+1),
-            );
+
+            $matchedLocale = $params['_locale'];
+            // Check whether the matched route corresponds to the active locale
+            // by generating the route matching $params, but for the active locale
+            $generated = null;
+            try {
+                $generated = $this->convertParamsAndGenerate($params);
+                $params['_locale'] = $this->context->getParameter('_locale');
+            }
+            catch (RouteNotFoundException $ex) {
+            }
+
+            $params['_route'] = substr($params['_route'], strlen($matchedLocale) + 1);
+
+            // If the generated url failed, or the new url is different: corresponding locales do not share the same route
+            if (null === $generated || $generated !== $url) {
+                if (true === $this->container->getParameter('jms_i18n_routing.redirect_to_host')) {
+                    return array(
+                        '_controller' => 'JMS\I18nRoutingBundle\Controller\RedirectController::redirectAction',
+                        'path'        => $url,
+                        'host'        => $host,
+                        'permanent'   => true,
+                        'scheme'      => $this->context->getScheme(),
+                        'httpPort'    => $this->context->getHttpPort(),
+                        'httpsPort'   => $this->context->getHttpsPort(),
+                        '_route'      => $params['_route'],
+                    );
+                } else {
+                    throw new ResourceNotFoundException(
+                        sprintf('Resource corresponding pattern %s not found for locale \'%s \'', $url, $this->getContext()->getParameter('_locale'))
+                    );
+                }
+            }
         }
 
         if (isset($params['_locale']) && 0 === strpos($params['_route'], $params['_locale'].'_')) {
@@ -165,5 +189,27 @@ class I18nRouter extends Router
         $collection = parent::getRouteCollection();
 
         return $this->container->get($this->i18nLoaderId)->load($collection);
+    }
+
+    /**
+     * Generates the route matching $params, but for the active locale
+     *
+     * @param array $params The params required for generating a route
+     *
+     * @return string The route corresponding $params for the active locale
+     */
+    private function convertParamsAndGenerate($params) {
+
+        $route = $params['_route'];
+        if (isset($params['_locale']) && 0 === strpos($params['_route'], $params['_locale'])) {
+
+            // Remove locale + '_'
+            $route = substr($params['_route'], strlen($params['_locale']) + 1);
+        }
+
+        unset($params['_route']);
+        unset($params['_locale']);
+
+        return $this->generate($route, $params);
     }
 }

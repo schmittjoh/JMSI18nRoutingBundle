@@ -29,6 +29,8 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use JMS\I18nRoutingBundle\Router\I18nRouter;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 class I18nRouterTest extends \PHPUnit_Framework_TestCase
 {
@@ -133,7 +135,106 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         ), $router->match('/willkommen-auf-unserer-webseite'));
     }
 
-    private function getRouter($config = 'routing.yml', $translator = null)
+    public function testRouteNotFoundForActiveLocale()
+    {
+        $router = $this->getNonRedirectingHostMapRouter();
+        $context = new RequestContext();
+        $context->setParameter('_locale', 'en_US');
+        $context->setHost('us.test');
+        $router->setContext($context);
+
+        // The route should be available for both en_UK and en_US
+        $this->assertEquals(array('_route' => 'news_overview', '_locale' => 'en_US'), $router->match('/news'));
+
+        $context->setParameter('_locale', 'en_UK');
+        $context->setHost('uk.test');
+        $router->setContext($context);
+
+        // The route should be available for both en_UK and en_US
+        $this->assertEquals(array('_route' => 'news_overview', '_locale' => 'en_UK'), $router->match('/news'));
+
+        // Tests whether generating a route to a different locale works
+        $this->assertEquals('http://nl.test/nieuws', $router->generate('news_overview', array('_locale' => 'nl_NL')));
+
+        $this->assertEquals(array('_route' => 'english_only', '_locale' => 'en_UK'), $router->match('/english-only'));
+    }
+
+    /**
+     * Tests whether sublocales are properly translated (en_UK and en_US can use different patterns)
+     */
+    public function testSubLocaleTranslation()
+    {
+        // Note that the default is set to en_UK by getDoubleLocaleRouter()
+        $router = $this->getNonRedirectingHostMapRouter();
+        $context = new RequestContext();
+        $context->setParameter('_locale', 'en_US');
+        $context->setHost('us.test');
+        $router->setContext($context);
+
+        // Test overwrite
+        $this->assertEquals(array('_route' => 'sub_locale', '_locale' => 'en_US'), $router->match('/american'));
+
+        $context->setParameter('_locale', 'en_UK');
+        $context->setHost('uk.test');
+        $router->setContext($context);
+        $this->assertEquals(array('_route' => 'enUK_only', '_locale' => 'en_UK'), $router->match('/enUK-only'));
+    }
+
+    /**
+     * @dataProvider getMatchThrowsExceptionFixtures
+     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testMatchThrowsException($locale, $host, $pattern)
+    {
+        $router = $this->getNonRedirectingHostMapRouter();
+        $context = new RequestContext();
+        $context->setParameter('_locale', $locale);
+        $context->setHost($host);
+        $router->setContext($context);
+
+        $router->match($pattern);
+    }
+
+    /**
+     * @dataProvider getGenerateThrowsExceptionFixtures
+     * @expectedException Symfony\Component\Routing\Exception\RouteNotFoundException
+     */
+    public function testGenerateThrowsException($locale, $host, $route)
+    {
+        $router = $this->getNonRedirectingHostMapRouter();
+        $context = new RequestContext();
+        $context->setParameter('_locale', $locale);
+        $context->setHost($host);
+        $router->setContext($context);
+
+        $router->generate($route);
+    }
+
+    /**
+     * DataProvider used by testMatchThrowsException
+     */
+    public function getMatchThrowsExceptionFixtures()
+    {
+        return array(
+            array('en_UK', 'uk.tests', '/nieuws'),
+            array('en_UK', 'uk.tests', '/dutch_only'),
+            array('en_US', 'us.tests', '/enUK-only'),
+            array('en_US', 'us.tests', '/english'),
+        );
+    }
+
+    /**
+     * DataProvider used by testGenerateThrowsException
+     */
+    public function getGenerateThrowsExceptionFixtures()
+    {
+        return array(
+            array('en_UK', 'uk.tests', 'dutch_only'),
+            array('en_US', 'us.tests', 'enUK_only'),
+        );
+    }
+
+    private function getRouter($config = 'routing.yml', $translator = null, $redirectToHost = true)
     {
         $container = new Container();
         $container->set('routing.loader', new YamlFileLoader(new FileLocator(__DIR__.'/Fixture')));
@@ -147,10 +248,42 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         }
 
         $container->set('i18n_loader', new I18nLoader($translator, array('en', 'de', 'fr'), 'en', 'routes', 'custom', sys_get_temp_dir()));
+        $container->setParameter('jms_i18n_routing.redirect_to_host', $redirectToHost);
 
         $router = new I18nRouter($container, $config);
         $router->setI18nLoaderId('i18n_loader');
         $router->setDefaultLocale('en');
+
+        return $router;
+    }
+
+    /**
+     * Gets the translator required for checking the DoubleLocale tests (en_UK etc)
+     */
+    private function getNonRedirectingHostMapRouter($config = 'routing.yml') {
+        $container = new Container();
+        $container->set('routing.loader', new YamlFileLoader(new FileLocator(__DIR__.'/Fixture')));
+
+        $translator = new Translator('en_UK', new MessageSelector());
+        $translator->setFallbackLocale('en');
+        $translator->addLoader('yml', new TranslationLoader());
+        $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en_UK.yml'), 'en_UK', 'routes');
+        $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en_US.yml'), 'en_US', 'routes');
+        $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.nl.yml'), 'nl', 'routes');
+        $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en.yml'), 'en', 'routes');
+
+        $container->set('i18n_loader', new I18nLoader($translator, array('en_UK', 'en_US', 'nl_NL', 'nl_BE'), 'en_UK', 'routes', 'custom', sys_get_temp_dir(), false));
+        $container->setParameter('jms_i18n_routing.redirect_to_host', false);
+
+        $router = new I18nRouter($container, $config);
+        $router->setI18nLoaderId('i18n_loader');
+        $router->setDefaultLocale('en_UK');
+        $router->setHostMap(array(
+            'en_UK' => 'uk.test',
+            'en_US' => 'us.test',
+            'nl_NL' => 'nl.test',
+            'nl_BE' => 'be.test',
+        ));
 
         return $router;
     }

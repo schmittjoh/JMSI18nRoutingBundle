@@ -27,3 +27,21 @@ non_i18n_route:
 
 _internal:
     pattern: /internal
+
+news_overview:
+    pattern: /news
+
+english_only:
+    pattern: /english-only
+    options: { i18n_locales: [en_UK, en_US] }
+
+dutch_only:
+    pattern: /dutch-only
+    options: { i18n_locales: [nl_NL, nl_BE] }
+
+enUK_only:
+    pattern: /enUK-only
+    options: { i18n_locales: [en_UK] }
+
+sub_locale:
+    pattern: /english
