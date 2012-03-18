@@ -2,7 +2,7 @@ JMSI18nRoutingBundle
 ===================
 
 Documentation: 
-[Resources/doc](https://github.com/schmittjoh/JMSI18nRoutingBundle/blob/master/Resources/doc/index.rst)
+[Resources/doc](http://jmsyst.com/bundles/JMSI18nRoutingBundle)
     
 
 Code License:
