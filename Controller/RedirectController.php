@@ -1,11 +1,7 @@
 <?php
 
 /*
- * Portions of the code in this file have been received from the Symfony2
- * project under the MIT license. All other code is subject to the following
- * license:
- *
- * Copyright 2011 Johannes M. Schmitt <schmittjoh@gmail.com>
+ * Copyright 2012 Johannes M. Schmitt <schmittjoh@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +27,9 @@ use Symfony\Component\DependencyInjection\ContainerAware;
  * Redirect Controller.
  *
  * Used by the I18nRouter to redirect between different hosts.
+ *
+ * @license Portions of this code were received from the Symfony2 project under
+ *          the MIT license. All other code is subject to the Apache2 license.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>

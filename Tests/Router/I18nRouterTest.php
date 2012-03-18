@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright 2011 Johannes M. Schmitt <schmittjoh@gmail.com>
+ * Copyright 2012 Johannes M. Schmitt <schmittjoh@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,6 +194,16 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $router->match($pattern);
     }
 
+    public function getMatchThrowsExceptionFixtures()
+    {
+        return array(
+            array('en_UK', 'uk.tests', '/nieuws'),
+            array('en_UK', 'uk.tests', '/dutch_only'),
+            array('en_US', 'us.tests', '/enUK-only'),
+            array('en_US', 'us.tests', '/english'),
+        );
+    }
+
     /**
      * @dataProvider getGenerateThrowsExceptionFixtures
      * @expectedException Symfony\Component\Routing\Exception\RouteNotFoundException
@@ -209,28 +219,46 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $router->generate($route);
     }
 
-    /**
-     * DataProvider used by testMatchThrowsException
-     */
-    public function getMatchThrowsExceptionFixtures()
-    {
-        return array(
-            array('en_UK', 'uk.tests', '/nieuws'),
-            array('en_UK', 'uk.tests', '/dutch_only'),
-            array('en_US', 'us.tests', '/enUK-only'),
-            array('en_US', 'us.tests', '/english'),
-        );
-    }
-
-    /**
-     * DataProvider used by testGenerateThrowsException
-     */
     public function getGenerateThrowsExceptionFixtures()
     {
         return array(
             array('en_UK', 'uk.tests', 'dutch_only'),
             array('en_US', 'us.tests', 'enUK_only'),
         );
+    }
+
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @expectedExceptionMessage The route "sub_locale" is not available on the current host "us.test", but only on these hosts "uk.test, nl.test, be.test".
+     */
+    public function testMatchThrowsResourceNotFoundWhenRouteIsUsedByMultipleLocalesOnDifferentHost()
+    {
+        $router = $this->getNonRedirectingHostMapRouter();
+
+        $context = $router->getContext();
+        $context->setParameter('_locale', 'en_US');
+
+        $router->match('/english');
+    }
+
+    /**
+     * @expectedException JMS\I18nRoutingBundle\Exception\NotAcceptableLanguageException
+     * @expectedExceptionMessage The requested language "en_US" was not available. Available languages: "en_UK, nl_NL, nl_BE"
+     */
+    public function testMatchThrowsNotAcceptableLanguageWhenRouteIsUsedByMultipleOtherLocalesOnSameHost()
+    {
+        $router = $this->getNonRedirectingHostMapRouter();
+        $router->setHostMap(array(
+            'en_US' => 'foo.com',
+            'en_UK' => 'foo.com',
+            'nl_NL' => 'nl.test',
+            'nl_BE' => 'be.test',
+        ));
+
+        $context = $router->getContext();
+        $context->setParameter('_locale', 'en_US');
+
+        $router->match('/english');
     }
 
     private function getRouter($config = 'routing.yml', $translator = null, $redirectToHost = true)
