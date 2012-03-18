@@ -2,22 +2,25 @@
 
 namespace JMS\I18nRoutingBundle\Translation;
 
+use JMS\I18nRoutingBundle\Router\I18nRouter;
+
+use JMS\I18nRoutingBundle\Router\RouteExclusionStrategyInterface;
+
 use Symfony\Component\Routing\RouterInterface;
 use JMS\TranslationBundle\Model\Message;
 use JMS\TranslationBundle\Model\MessageCatalogue;
-use JMS\I18nRoutingBundle\Router\I18nLoader;
 use JMS\TranslationBundle\Translation\ExtractorInterface;
 
 class RouteTranslationExtractor implements ExtractorInterface
 {
     private $router;
-    private $i18nLoader;
+    private $routeExclusionStrategy;
     private $domain = 'routes';
 
-    public function __construct(RouterInterface $router, I18nLoader $loader)
+    public function __construct(RouterInterface $router, RouteExclusionStrategyInterface $routeExclusionStrategy)
     {
         $this->router = $router;
-        $this->i18nLoader = $loader;
+        $this->routeExclusionStrategy = $routeExclusionStrategy;
     }
 
     public function setDomain($domain)
@@ -29,7 +32,14 @@ class RouteTranslationExtractor implements ExtractorInterface
     {
         $catalogue = new MessageCatalogue();
 
-        foreach ($this->i18nLoader->extract($this->router->getRouteCollection()) as $name => $route) {
+        $collection = $this->router instanceof I18nRouter ? $this->router->getOriginalRouteCollection()
+            : $this->router->getRouteCollection();
+
+        foreach ($collection->all() as $name => $route) {
+            if ($this->routeExclusionStrategy->shouldExcludeRoute($name, $route)) {
+                continue;
+            }
+
             $message = new Message($name, $this->domain);
             $message->setDesc($route->getPattern());
             $catalogue->add($message);

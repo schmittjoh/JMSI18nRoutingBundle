@@ -2,7 +2,12 @@ Configuration
 -------------
 The bundle supports three different strategies out-of-the-box to make the
 most common scenarios a bit easier. You can switch between these strategies
-at any time (just make sure to clear the appdevUrl* files in your cache dir).
+at any time.
+
+.. note ::
+
+    You need to manually clear your cache when switching between different 
+    strategies.
 
 1. Scenario: Prefixing All Routes With The Locale
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

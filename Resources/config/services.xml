@@ -8,6 +8,7 @@
         <parameter key="jms_i18n_routing.router.class">JMS\I18nRoutingBundle\Router\I18nRouter</parameter>
         
         <parameter key="jms_i18n_routing.loader.class">JMS\I18nRoutingBundle\Router\I18nLoader</parameter>
+        <parameter key="jms_i18n_routing.route_exclusion_strategy.class">JMS\I18nRoutingBundle\Router\DefaultRouteExclusionStrategy</parameter>
         
         <parameter key="jms_i18n_routing.locale_changing_listener.class">JMS\I18nRoutingBundle\EventListener\LocaleChangingListener</parameter>
         <parameter key="jms_i18n_routing.locale_choosing_listener.class">JMS\I18nRoutingBundle\EventListener\LocaleChoosingListener</parameter>
@@ -23,6 +24,9 @@
             <call method="setDefaultLocale">
                 <argument>%jms_i18n_routing.default_locale%</argument>
             </call>
+            <call method="setRedirectToHost">
+                <argument>%jms_i18n_routing.redirect_to_host%</argument>
+            </call>
         </service>
         
         <service id="jms_i18n_routing.locale_changing_listener" class="%jms_i18n_routing.locale_changing_listener.class%" public="false" />
@@ -31,19 +35,23 @@
             <argument>%jms_i18n_routing.locales%</argument>
         </service>
         
+        <service id="jms_i18n_routing.route_exclusion_strategy" class="%jms_i18n_routing.route_exclusion_strategy.class%" public="false" />
+        
         <service id="jms_i18n_routing.loader" class="%jms_i18n_routing.loader.class%">
             <argument type="service" id="translator" />
+            <argument type="service" id="jms_i18n_routing.route_exclusion_strategy" />
             <argument>%jms_i18n_routing.locales%</argument>
             <argument>%jms_i18n_routing.default_locale%</argument>
-            <argument>%jms_i18n_routing.catalogue%</argument>
             <argument>%jms_i18n_routing.strategy%</argument>
             <argument>%kernel.cache_dir%</argument>
-            <argument>%jms_i18n_routing.redirect_to_host%</argument>
+            <call method="setTranslationDomain">
+                <argument>%jms_i18n_routing.catalogue%</argument>
+            </call>
         </service>
         
         <service id="jms_i18n_routing.route_translation_extractor" class="%jms_i18n_routing.route_translation_extractor.class%" public="false">
             <argument type="service" id="router" />
-            <argument type="service" id="jms_i18n_routing.loader" />
+            <argument type="service" id="jms_i18n_routing.route_exclusion_strategy" />
             <tag name="jms_translation.extractor" alias="jms_i18n_routing" />
         </service>
     </services>

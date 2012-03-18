@@ -24,31 +24,92 @@ use Symfony\Component\Routing\RouteCollection;
 use JMS\I18nRoutingBundle\Util\RouteExtractor;
 use Symfony\Component\Config\Loader\LoaderResolver;
 
+/**
+ * This loader expands all routes which are eligible for i18n.
+ *
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ */
 class I18nLoader
 {
     private $translator;
+    private $translationDomain = 'routes';
     private $locales;
-    private $catalogue;
     private $cacheDir;
     private $defaultLocale;
     private $strategy;
-    private $redirectToHost;
+    private $routeExclusionStrategy;
 
-    public function __construct(TranslatorInterface $translator, array $locales, $defaultLocale, $catalogue, $strategy, $cacheDir, $redirectToHost = true)
+    public function __construct(TranslatorInterface $translator, RouteExclusionStrategyInterface $routeExclusionStrategy, array $locales, $defaultLocale, $strategy, $cacheDir)
     {
+        $this->routeExclusionStrategy = $routeExclusionStrategy;
         $this->translator = $translator;
         $this->locales = $locales;
         $this->defaultLocale = $defaultLocale;
-        $this->catalogue = $catalogue;
         $this->strategy = $strategy;
         $this->cacheDir = $cacheDir;
-        $this->redirectToHost = $redirectToHost;
+    }
+
+    public function setTranslationDomain($domain)
+    {
+        $this->translationDomain = $domain;
     }
 
     public function load(RouteCollection $collection)
     {
         $i18nCollection = new RouteCollection();
+        $this->addResources($i18nCollection, $collection);
 
+        foreach ($collection->all() as $name => $route) {
+            if ($this->routeExclusionStrategy->shouldExcludeRoute($name, $route)) {
+                $i18nCollection->add($name, $route);
+                continue;
+            }
+
+            foreach ($this->getI18nPatterns($name, $route) as $pattern => $locales) {
+                // If this pattern is used for more than one locale, we need to keep the original route.
+                // We still add individual routes for each locale afterwards for faster generation.
+                if (count($locales) > 1) {
+                    $catchMultipleRoute = clone $route;
+                    $catchMultipleRoute->setPattern($pattern);
+                    $catchMultipleRoute->setDefault('_locales', $locales);
+                    $i18nCollection->add(implode('_', $locales).'_'.$name, $catchMultipleRoute);
+                }
+
+                foreach ($locales as $locale) {
+                    $localeRoute = clone $route;
+                    $localeRoute->setPattern($pattern);
+                    $localeRoute->setDefault('_locale', $locale);
+                    $i18nCollection->add($locale.'_'.$name, $localeRoute);
+                }
+            }
+        }
+
+        return $i18nCollection;
+    }
+
+    private function getI18nPatterns($routeName, Route $route)
+    {
+        $patterns = array();
+        foreach ($route->getOption('i18n_locales') ?: $this->locales as $locale) {
+            // if no translation exists, we use the current pattern
+            if ($routeName === $i18nPattern = $this->translator->trans($routeName, array(), $this->translationDomain, $locale)) {
+                $i18nPattern = $route->getPattern();
+            }
+
+            // prefix with locale if requested
+            if (I18nRouter::STRATEGY_PREFIX === $this->strategy
+                    || (I18nRouter::STRATEGY_PREFIX_EXCEPT_DEFAULT === $this->strategy && $this->defaultLocale !== $locale)) {
+                $i18nPattern = '/'.$locale.$i18nPattern;
+            }
+
+            $patterns[$i18nPattern][] = $locale;
+        }
+
+        return $patterns;
+    }
+
+    private function addResources(RouteCollection $i18nCollection, RouteCollection $collection)
+    {
         // add translation resources
         foreach ($this->locales as $locale) {
             if (file_exists($metadata = $this->cacheDir.'/translations/catalogue.'.$locale.'.php.meta')) {
@@ -62,94 +123,5 @@ class I18nLoader
         foreach ($collection->getResources() as $resource) {
             $i18nCollection->addResource($resource);
         }
-
-        foreach ($collection->all() as $name => $route) {
-            if ($this->isNotTranslatable($name, $route)) {
-                $i18nCollection->add($name, $route);
-                continue;
-            }
-
-            $keepOriginal = false;
-            $translations = new RouteCollection();
-            $patterns = array();
-            foreach ($route->getOption('i18n_locales') ?: $this->locales as $locale) {
-                $i18nRoute = clone $route;
-
-                // if no translation exists, we use the current pattern
-                if ($name === $i18nPattern = $this->translator->trans($name, array(), $this->catalogue, $locale)) {
-                    $i18nPattern = $route->getPattern();
-                }
-
-                // prefix with locale if requested
-                if (I18nRouter::STRATEGY_PREFIX === $this->strategy
-                    || (I18nRouter::STRATEGY_PREFIX_EXCEPT_DEFAULT === $this->strategy && $this->defaultLocale !== $locale)) {
-                    $i18nPattern = '/'.$locale.$i18nPattern;
-                }
-
-                if (isset($patterns[$i18nPattern])) {
-                    $keepOriginal = true;
-                }
-                $patterns[$i18nPattern] = true;
-
-                $i18nRoute->setPattern($i18nPattern);
-                $i18nRoute->setDefault('_locale', $locale);
-                $translations->add($locale.'_'.$name, $i18nRoute);
-            }
-
-            // The original route is NOT needed (actually not wanted) when redirectToHost is set. 
-            // By not keeping the original it becomes possible to distinguish between routes 
-            // not available for the active locale and untranslatable routes $route->getOption('i18n'))
-            if (($keepOriginal || $route->getOption('i18n_keep')) && $this->redirectToHost ) {
-                $i18nCollection->add($name, $route);
-            }
-
-            $i18nCollection->addCollection($translations);
-        }
-
-        return $i18nCollection;
-    }
-
-    /**
-     * TODO: This should be refactored, it is not strictly related to loading
-     *
-     * @param RouteCollection $collection
-     * @return RouteCollection
-     */
-    public function extract(RouteCollection $collection)
-    {
-        $nonI18nRoutes = array();
-        foreach ($collection->all() as $k => $v) {
-            if (0 === strpos($k, $this->defaultLocale.'_') && null === $collection->get(substr($k, 3))) {
-                if (I18nRouter::STRATEGY_PREFIX === $this->strategy) {
-                    $v = clone $v;
-                    $v->setPattern(substr($v->getPattern(), 3));
-                }
-
-                $nonI18nRoutes[substr($k, 3)] = $v;
-                continue;
-            }
-
-            if ($this->isNotTranslatable($k, $v)) {
-                continue;
-            }
-
-            $nonI18nRoutes[$k] = $v;
-        }
-
-        return $nonI18nRoutes;
-    }
-
-    /**
-     * TODO: Should be moved to a dedicated service
-     *
-     * @param string $name
-     * @param Route $route
-     * @return boolean
-     */
-    private function isNotTranslatable($name, Route $route)
-    {
-        return false === $route->getOption('i18n')
-               || preg_match('/^(?:_|[a-z]{2}_)/', $name) > 0
-        ;
     }
 }

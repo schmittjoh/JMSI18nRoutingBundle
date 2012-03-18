@@ -18,6 +18,8 @@
 
 namespace JMS\I18nRoutingBundle\Router;
 
+use JMS\I18nRoutingBundle\Exception\NotAcceptableLanguageException;
+
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -39,12 +41,24 @@ class I18nRouter extends Router
     private $i18nLoaderId;
     private $container;
     private $defaultLocale;
+    private $redirectToHost = true;
 
     public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null, array $defaults = array())
     {
         parent::__construct($container, $resource, $options, $context, $defaults);
 
         $this->container = $container;
+    }
+
+    /**
+     * Whether the user should be redirected to a different host if the
+     * matching route is not belonging to the current domain.
+     *
+     * @param Boolean $bool
+     */
+    public function setRedirectToHost($bool)
+    {
+        $this->redirectToHost = (Boolean) $bool;
     }
 
     /**
@@ -96,29 +110,26 @@ class I18nRouter extends Router
 
         $generator = $this->getGenerator();
 
-        // skip internal routes
-        if ('_' !== $name[0]) {
-            // if an absolute URL is requested, we set the correct host
+        // if an absolute URL is requested, we set the correct host
+        if ($absolute && $this->hostMap) {
+            $currentHost = $this->context->getHost();
+            $this->context->setHost($this->hostMap[$locale]);
+        }
+
+        try {
+            $url = $generator->generate($locale.'_'.$name, $parameters, $absolute);
+
             if ($absolute && $this->hostMap) {
-                $currentHost = $this->context->getHost();
-                $this->context->setHost($this->hostMap[$locale]);
+                $this->context->setHost($currentHost);
             }
 
-            try {
-                $url = $generator->generate($locale.'_'.$name, $parameters, $absolute);
-
-                if ($absolute && $this->hostMap) {
-                    $this->context->setHost($currentHost);
-                }
-
-                return $url;
-            } catch (RouteNotFoundException $ex) {
-                if ($absolute && $this->hostMap) {
-                    $this->context->setHost($currentHost);
-                }
-
-                // fallback to default behavior
+            return $url;
+        } catch (RouteNotFoundException $ex) {
+            if ($absolute && $this->hostMap) {
+                $this->context->setHost($currentHost);
             }
+
+            // fallback to default behavior
         }
 
         // use the default behavior if no localized route exists
@@ -138,47 +149,68 @@ class I18nRouter extends Router
     {
         $params = $this->getMatcher()->match($url);
 
-        // check if a host change or RouteNotFoundException is required
-        if (false !== $params && isset($params['_locale'])
-            && isset($this->hostMap[$params['_locale']])
-            && $this->context->getHost() !== $host = $this->hostMap[$params['_locale']]) {
-
-            $matchedLocale = $params['_locale'];
-            // Check whether the matched route corresponds to the active locale
-            // by generating the route matching $params, but for the active locale
-            $generated = null;
-            try {
-                $generated = $this->convertParamsAndGenerate($params);
-                $params['_locale'] = $this->context->getParameter('_locale');
-            }
-            catch (RouteNotFoundException $ex) {
+        if (false !== $params && isset($params['_locales'])) {
+            if (0 === strpos($params['_route'], $localePrefix = implode('_', $params['_locales']))) {
+                $params['_route'] = substr($params['_route'], strlen($localePrefix) + 1);
             }
 
-            $params['_route'] = substr($params['_route'], strlen($matchedLocale) + 1);
+            if (($currentLocale = $this->context->getParameter('_locale'))
+                    && !in_array($currentLocale = $this->context->getParameter('_locale'), $params['_locales'], true)) {
+                // TODO: We might want to allow the user to be redirected to the route for the given locale if
+                //       it exists regardless of whether it would be on another domain, or the same domain.
+                //       Below we assume that we do not want to redirect always.
 
-            // If the generated url failed, or the new url is different: corresponding locales do not share the same route
-            if (null === $generated || $generated !== $url) {
-                if (true === $this->container->getParameter('jms_i18n_routing.redirect_to_host')) {
-                    return array(
-                        '_controller' => 'JMS\I18nRoutingBundle\Controller\RedirectController::redirectAction',
-                        'path'        => $url,
-                        'host'        => $host,
-                        'permanent'   => true,
-                        'scheme'      => $this->context->getScheme(),
-                        'httpPort'    => $this->context->getHttpPort(),
-                        'httpsPort'   => $this->context->getHttpsPort(),
-                        '_route'      => $params['_route'],
-                    );
-                } else {
-                    throw new ResourceNotFoundException(
-                        sprintf('Resource corresponding pattern %s not found for locale \'%s \'', $url, $this->getContext()->getParameter('_locale'))
-                    );
+                // if the available locales are on a different host, throw a ResourceNotFoundException
+                if ($this->hostMap) {
+                    // generate host maps
+                    $hostMap = $this->hostMap;
+                    $availableHosts = array_map(function($locale) use ($hostMap) {
+                        return $hostMap[$locale];
+                    }, $params['_locales']);
+
+                    $differentHost = true;
+                    foreach ($availableHosts as $host) {
+                        if ($this->hostMap[$currentLocale] === $host) {
+                            $differentHost = false;
+                            break;
+                        }
+                    }
+
+                    if ($differentHost) {
+                        throw new ResourceNotFoundException(sprintf('The route "%s" is not available on the current host "%s", but only on these hosts "%s".',
+                            $params['_route'], $this->hostMap[$currentLocale], implode(', ', $availableHosts)));
+                    }
                 }
+
+                // no host map, or same host means that the given locale is not supported for this route
+                throw new NotAcceptableLanguageException($currentLocale, $params['_locales']);
             }
+
+            unset($params['_locales']);
+            $params['_locale'] = $currentLocale;
+        } else if (false !== $params && isset($params['_locale']) && 0 === strpos($params['_route'], $params['_locale'].'_')) {
+            $params['_route'] = substr($params['_route'], strlen($params['_locale']) + 1);
         }
 
-        if (isset($params['_locale']) && 0 === strpos($params['_route'], $params['_locale'].'_')) {
-            $params['_route'] = substr($params['_route'], strlen($params['_locale']) + 1);
+        // check if the matched route belongs to a different locale on another host
+        if (false !== $params && isset($params['_locale'])
+                && isset($this->hostMap[$params['_locale']])
+                && $this->context->getHost() !== $host = $this->hostMap[$params['_locale']]) {
+            if (!$this->redirectToHost) {
+                throw new ResourceNotFoundException(sprintf(
+                    'Resource corresponding to pattern "%s" not found for locale "%s".', $url, $this->getContext()->getParameter('_locale')));
+            }
+
+            return array(
+                '_controller' => 'JMS\I18nRoutingBundle\Controller\RedirectController::redirectAction',
+                'path'        => $url,
+                'host'        => $host,
+                'permanent'   => true,
+                'scheme'      => $this->context->getScheme(),
+                'httpPort'    => $this->context->getHttpPort(),
+                'httpsPort'   => $this->context->getHttpsPort(),
+                '_route'      => $params['_route'],
+            );
         }
 
         return $params;
@@ -191,25 +223,8 @@ class I18nRouter extends Router
         return $this->container->get($this->i18nLoaderId)->load($collection);
     }
 
-    /**
-     * Generates the route matching $params, but for the active locale
-     *
-     * @param array $params The params required for generating a route
-     *
-     * @return string The route corresponding $params for the active locale
-     */
-    private function convertParamsAndGenerate($params) {
-
-        $route = $params['_route'];
-        if (isset($params['_locale']) && 0 === strpos($params['_route'], $params['_locale'])) {
-
-            // Remove locale + '_'
-            $route = substr($params['_route'], strlen($params['_locale']) + 1);
-        }
-
-        unset($params['_route']);
-        unset($params['_locale']);
-
-        return $this->generate($route, $params);
+    public function getOriginalRouteCollection()
+    {
+        return parent::getRouteCollection();
     }
 }

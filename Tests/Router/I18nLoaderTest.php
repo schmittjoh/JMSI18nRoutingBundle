@@ -18,6 +18,8 @@
 
 namespace JMS\I18nRoutingBundle\Tests\Router;
 
+use JMS\I18nRoutingBundle\Router\DefaultRouteExclusionStrategy;
+
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
@@ -46,16 +48,13 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('en', $en->getDefault('_locale'));
     }
 
-    /**
-     * @dataProvider getRedirectAndCollectionCount
-     */
-    public function testLoadDoesNotRemoveOriginalIfNotAllRoutesHaveTranslationsUnlessRedirectIsOff($redirectToHost, $collectionCount)
+    public function testLoadDoesNotRemoveOriginalIfNotAllRoutesHaveTranslationsUnlessRedirectIsOff()
     {
         $col = new RouteCollection();
         $col->add('support', new Route('/support'));
-        $i18nCol = $this->getLoader(I18nRouter::STRATEGY_CUSTOM, $redirectToHost)->load($col);
+        $i18nCol = $this->getLoader(I18nRouter::STRATEGY_CUSTOM)->load($col);
 
-        $this->assertEquals($collectionCount, count($i18nCol->all()));
+        $this->assertEquals(3, count($i18nCol->all()));
 
         $de = $i18nCol->get('de_support');
         $this->assertEquals('/support', $de->getPattern());
@@ -127,23 +126,6 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/contact', $en->getPattern());
     }
 
-    /**
-     * @dataProvider getStrategies
-     */
-    public function testExtract($strategy)
-    {
-        $loader = $this->getLoader($strategy);
-
-        $col = new RouteCollection();
-        $col->add('contact', new Route('/contact'));
-        $i18nCol = $loader->load($col);
-
-        $toTranslate = $loader->extract($i18nCol);
-        $this->assertEquals(1, count($toTranslate));
-
-        $this->assertEquals('/contact', $toTranslate['contact']->getPattern());
-    }
-
     public function getStrategies()
     {
         return array(array('custom'), array('prefix'), array('prefix_except_default'));
@@ -156,14 +138,6 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.de.yml'), 'de', 'routes');
         $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en.yml'), 'en', 'routes');
 
-        return new I18nLoader($translator, array('en', 'de'), 'en', 'routes', $strategy, sys_get_temp_dir(), $redirectToHost);
-    }
-
-    public function getRedirectAndCollectionCount()
-    {
-        return array(
-            array(true, 3),
-            array(false, 2),
-        );
+        return new I18nLoader($translator, new DefaultRouteExclusionStrategy(), array('en', 'de'), 'en', $strategy, sys_get_temp_dir(), $redirectToHost);
     }
 }

@@ -18,7 +18,7 @@
 
 namespace JMS\I18nRoutingBundle\Tests\Functional;
 
-use Symfony\Component\HttpKernel\Util\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class BaseTestCase extends WebTestCase
@@ -42,7 +42,7 @@ class BaseTestCase extends WebTestCase
     {
         parent::tearDown();
 
-        $fs = new Filesystem();
-        $fs->remove(sys_get_temp_dir().'/JMSI18nRoutingBundle');
+//         $fs = new Filesystem();
+//         $fs->remove(sys_get_temp_dir().'/JMSI18nRoutingBundle');
     }
 }

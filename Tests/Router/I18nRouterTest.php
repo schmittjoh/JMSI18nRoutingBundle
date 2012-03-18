@@ -18,8 +18,9 @@
 
 namespace JMS\I18nRoutingBundle\Tests\Router;
 
-use Symfony\Component\Translation\IdentityTranslator;
+use JMS\I18nRoutingBundle\Router\DefaultRouteExclusionStrategy;
 
+use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\Loader\YamlFileLoader as TranslationLoader;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\Translator;
@@ -114,8 +115,6 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
             'de' => 'de.test',
             'fr' => 'fr.test',
         ));
-
-        $this->assertEquals(array('_controller' => 'foo', '_route' => 'welcome'), $router->match('/welcome'));
 
         $context = new RequestContext('', 'GET', 'en.test');
         $context->setParameter('_locale', 'en');
@@ -247,7 +246,7 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
             $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en.yml'), 'en', 'routes');
         }
 
-        $container->set('i18n_loader', new I18nLoader($translator, array('en', 'de', 'fr'), 'en', 'routes', 'custom', sys_get_temp_dir()));
+        $container->set('i18n_loader', new I18nLoader($translator, new DefaultRouteExclusionStrategy(), array('en', 'de', 'fr'), 'en', 'custom', sys_get_temp_dir()));
         $container->setParameter('jms_i18n_routing.redirect_to_host', $redirectToHost);
 
         $router = new I18nRouter($container, $config);
@@ -272,10 +271,10 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.nl.yml'), 'nl', 'routes');
         $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en.yml'), 'en', 'routes');
 
-        $container->set('i18n_loader', new I18nLoader($translator, array('en_UK', 'en_US', 'nl_NL', 'nl_BE'), 'en_UK', 'routes', 'custom', sys_get_temp_dir(), false));
-        $container->setParameter('jms_i18n_routing.redirect_to_host', false);
+        $container->set('i18n_loader', new I18nLoader($translator, new DefaultRouteExclusionStrategy(), array('en_UK', 'en_US', 'nl_NL', 'nl_BE'), 'en_UK', 'custom', sys_get_temp_dir(), false));
 
         $router = new I18nRouter($container, $config);
+        $router->setRedirectToHost(false);
         $router->setI18nLoaderId('i18n_loader');
         $router->setDefaultLocale('en_UK');
         $router->setHostMap(array(
