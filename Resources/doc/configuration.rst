@@ -12,12 +12,21 @@ at any time.
 1. Scenario: Prefixing All Routes With The Locale
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Config::
+.. configuration-block ::
 
-    jms_i18n_routing:
-        default_locale: en
-        locales: [en, de]
-        strategy: prefix
+    .. code-block :: yaml
+
+        jms_i18n_routing:
+            default_locale: en
+            locales: [en, de]
+            strategy: prefix
+            
+    .. code-block :: xml
+    
+        <jms-i18n-routing
+            default-locale="en"
+            locales="en, de"
+            strategy="prefix" />
 
 Resulting URLs::
 
@@ -28,12 +37,21 @@ Resulting URLs::
 2. Scenario: Prefixing All Routes With The Locale except those of the default locale
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Config::
+.. configuration-block ::
 
-    jms_i18n_routing:
-        default_locale: en
-        locales: [de, en]
-        strategy: prefix_except_default
+    .. code-block :: yaml
+
+        jms_i18n_routing:
+            default_locale: en
+            locales: [de, en]
+            strategy: prefix_except_default
+
+    .. code-block :: xml
+    
+        <jms-i18n-routing
+            default-locale="en"
+            locales="de, en"
+            strategy="prefix_except_default" />
         
 Resulting URLs::
 
@@ -43,32 +61,64 @@ Resulting URLs::
 3. Scenario: Using different hosts for each locale
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Config::
+.. configuration-block ::
 
-    jms_i18n_routing:
-        default_locale: en
-        locales: [en, de]
-        strategy: custom
-        hosts:
-            en: foo.com
-            de: foo.de 
+    .. code-block :: yaml
+
+        jms_i18n_routing:
+            default_locale: en
+            locales: [en, de]
+            strategy: custom
+            hosts:
+                en: foo.com
+                de: foo.de 
+            redirect_to_host: true
+    
+    .. code-block :: xml
+    
+        <jms-i18n-routing 
+            default-locale="en" 
+            locales="en, de" 
+            strategy="custom"
+            redirect-to-host="true">
+            
+            <host locale="en">foo.com</host>
+            <host locale="de">foo.de</host>
+            
+        </jms-i18n-routing>
+
+Whenever a pattern is matched to a different host's locale a redirect is used, 
+unless ``redirect_to_host`` is set to false, in which case a ``ResourceNotFoundException`` 
+is thrown which typically results in a 404 error.
 
 Resulting URLs::
 
 - http://foo.de/kontakt
 - http://foo.com/contact
 
-(URLs will only be absolute when necessary)
+.. note ::
 
-4. Scenario: something else
+    The router will automatically detect when an absolute URL is necessary, and
+    then add the host automatically.
+
+4. Scenario: Something Else
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Config:: 
+.. configuration-block ::
 
-    jms_i18n_routing:
-        default_locale: en
-        locales: [en, de]
-        strategy: custom
+    .. code-block :: yaml
+    
+        jms_i18n_routing:
+            default_locale: en
+            locales: [en, de]
+            strategy: custom
+            
+    .. code-block :: xml
+    
+        <jms-i18n-routing
+            default-locale="en"
+            locales="en, de"
+            strategy="custom" />
 
 Resulting URLs::
 
