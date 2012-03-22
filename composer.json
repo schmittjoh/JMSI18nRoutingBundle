@@ -3,7 +3,7 @@
     "description":  "This bundle allows you to create i18n routes.",
     "keywords":     ["translation","multilanguage","routing"],
     "type":         "symfony-bundle",
-    "license":      "Apache",
+    "license":      "Apache2",
     "authors": [
         {
             "name":   "Johannes M. Schmitt",
