@@ -31,7 +31,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
  */
 class I18nLoader
 {
-    const ROUTING_PREFIX= '__CG__';
+    const ROUTING_PREFIX = '__RG__';
 
     private $translator;
     private $translationDomain = 'routes';

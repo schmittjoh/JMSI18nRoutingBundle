@@ -39,11 +39,11 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(2, count($i18nCol->all()));
 
-        $de = $i18nCol->get('de'.I18nLoader::ROUTING_PREFIX.'contact');
+        $de = $i18nCol->get('de__RG__contact');
         $this->assertEquals('/kontakt', $de->getPattern());
         $this->assertEquals('de', $de->getDefault('_locale'));
 
-        $en = $i18nCol->get('en'.I18nLoader::ROUTING_PREFIX.'contact');
+        $en = $i18nCol->get('en__RG__contact');
         $this->assertEquals('/contact', $en->getPattern());
         $this->assertEquals('en', $en->getDefault('_locale'));
     }
@@ -56,10 +56,10 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(3, count($i18nCol->all()));
 
-        $de = $i18nCol->get('de'.I18nLoader::ROUTING_PREFIX.'support');
+        $de = $i18nCol->get('de__RG__support');
         $this->assertEquals('/support', $de->getPattern());
 
-        $en = $i18nCol->get('en'.I18nLoader::ROUTING_PREFIX.'support');
+        $en = $i18nCol->get('en__RG__support');
         $this->assertEquals('/support', $en->getPattern());
     }
 
@@ -83,8 +83,8 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
         $i18nCol = $this->getLoader()->load($col);
 
         $this->assertEquals(3, count($i18nCol->all()));
-        $this->assertEquals('/not-translated', $i18nCol->get('de'.I18nLoader::ROUTING_PREFIX.'untranslated_route')->getPattern());
-        $this->assertEquals('/not-translated', $i18nCol->get('en'.I18nLoader::ROUTING_PREFIX.'untranslated_route')->getPattern());
+        $this->assertEquals('/not-translated', $i18nCol->get('de__RG__untranslated_route')->getPattern());
+        $this->assertEquals('/not-translated', $i18nCol->get('en__RG__untranslated_route')->getPattern());
     }
 
     public function testLoadIfRouteIsNotTranslatedToAllLocales()
@@ -93,7 +93,7 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
         $col->add('route', new Route('/not-available-everywhere', array(), array(), array('i18n_locales' => array('en'))));
         $i18nCol = $this->getLoader()->load($col);
 
-        $this->assertEquals(array('en'.I18nLoader::ROUTING_PREFIX.'route'), array_keys($i18nCol->all()));
+        $this->assertEquals(array('en__RG__route'), array_keys($i18nCol->all()));
     }
 
     public function testLoadIfStrategyIsPrefix()
@@ -104,10 +104,10 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(2, count($i18nCol->all()));
 
-        $de = $i18nCol->get('de'.I18nLoader::ROUTING_PREFIX.'contact');
+        $de = $i18nCol->get('de__RG__contact');
         $this->assertEquals('/de/kontakt', $de->getPattern());
 
-        $en = $i18nCol->get('en'.I18nLoader::ROUTING_PREFIX.'contact');
+        $en = $i18nCol->get('en__RG__contact');
         $this->assertEquals('/en/contact', $en->getPattern());
     }
 
@@ -119,10 +119,10 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(2, count($i18nCol->all()));
 
-        $de = $i18nCol->get('de'.I18nLoader::ROUTING_PREFIX.'contact');
+        $de = $i18nCol->get('de__RG__contact');
         $this->assertEquals('/de/kontakt', $de->getPattern());
 
-        $en = $i18nCol->get('en'.I18nLoader::ROUTING_PREFIX.'contact');
+        $en = $i18nCol->get('en__RG__contact');
         $this->assertEquals('/contact', $en->getPattern());
     }
 
