@@ -117,7 +117,7 @@ class I18nRouter extends Router
         }
 
         try {
-            $url = $generator->generate($locale.'_'.$name, $parameters, $absolute);
+            $url = $generator->generate($locale.I18nLoader::ROUTING_PREFIX.$name, $parameters, $absolute);
 
             if ($absolute && $this->hostMap) {
                 $this->context->setHost($currentHost);
@@ -150,8 +150,8 @@ class I18nRouter extends Router
         $params = $this->getMatcher()->match($url);
 
         if (false !== $params && isset($params['_locales'])) {
-            if (0 === strpos($params['_route'], $localePrefix = implode('_', $params['_locales']))) {
-                $params['_route'] = substr($params['_route'], strlen($localePrefix) + 1);
+            if ( 0 < $pos = strpos($params['_route'], I18nLoader::ROUTING_PREFIX)) {
+                $params['_route'] = substr($params['_route'], $pos + strlen(I18nLoader::ROUTING_PREFIX));
             }
 
             if (($currentLocale = $this->context->getParameter('_locale'))
@@ -188,8 +188,8 @@ class I18nRouter extends Router
 
             unset($params['_locales']);
             $params['_locale'] = $currentLocale;
-        } else if (false !== $params && isset($params['_locale']) && 0 === strpos($params['_route'], $params['_locale'].'_')) {
-            $params['_route'] = substr($params['_route'], strlen($params['_locale']) + 1);
+        } else if (false !== $params && isset($params['_locale']) && 0 < $pos = strpos($params['_route'], I18nLoader::ROUTING_PREFIX)) {
+            $params['_route'] = substr($params['_route'], $pos + strlen(I18nLoader::ROUTING_PREFIX));
         }
 
         // check if the matched route belongs to a different locale on another host
