@@ -18,6 +18,8 @@
 
 namespace JMS\I18nRoutingBundle\Tests\Router;
 
+use JMS\I18nRoutingBundle\Router\DefaultPatternGenerationStrategy;
+
 use JMS\I18nRoutingBundle\Router\DefaultRouteExclusionStrategy;
 
 use Symfony\Component\Translation\IdentityTranslator;
@@ -274,8 +276,7 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
             $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en.yml'), 'en', 'routes');
         }
 
-        $container->set('i18n_loader', new I18nLoader($translator, new DefaultRouteExclusionStrategy(), array('en', 'de', 'fr'), 'en', 'custom', sys_get_temp_dir()));
-        $container->setParameter('jms_i18n_routing.redirect_to_host', $redirectToHost);
+        $container->set('i18n_loader', new I18nLoader(new DefaultRouteExclusionStrategy(), new DefaultPatternGenerationStrategy('custom', $translator, array('en', 'de', 'fr'), sys_get_temp_dir())));
 
         $router = new I18nRouter($container, $config);
         $router->setI18nLoaderId('i18n_loader');
@@ -299,7 +300,7 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.nl.yml'), 'nl', 'routes');
         $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en.yml'), 'en', 'routes');
 
-        $container->set('i18n_loader', new I18nLoader($translator, new DefaultRouteExclusionStrategy(), array('en_UK', 'en_US', 'nl_NL', 'nl_BE'), 'en_UK', 'custom', sys_get_temp_dir(), false));
+        $container->set('i18n_loader', new I18nLoader(new DefaultRouteExclusionStrategy(), new DefaultPatternGenerationStrategy('custom', $translator, array('en_UK', 'en_US', 'nl_NL', 'nl_BE'), sys_get_temp_dir(), 'routes', 'en_UK')));
 
         $router = new I18nRouter($container, $config);
         $router->setRedirectToHost(false);

@@ -18,6 +18,8 @@
 
 namespace JMS\I18nRoutingBundle\Tests\Router;
 
+use JMS\I18nRoutingBundle\Router\DefaultPatternGenerationStrategy;
+
 use JMS\I18nRoutingBundle\Router\DefaultRouteExclusionStrategy;
 
 use Symfony\Component\Routing\Route;
@@ -52,7 +54,7 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $col = new RouteCollection();
         $col->add('support', new Route('/support'));
-        $i18nCol = $this->getLoader(I18nRouter::STRATEGY_CUSTOM)->load($col);
+        $i18nCol = $this->getLoader('custom')->load($col);
 
         $this->assertEquals(3, count($i18nCol->all()));
 
@@ -100,7 +102,7 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $col = new RouteCollection();
         $col->add('contact', new Route('/contact'));
-        $i18nCol = $this->getLoader(I18nRouter::STRATEGY_PREFIX)->load($col);
+        $i18nCol = $this->getLoader('prefix')->load($col);
 
         $this->assertEquals(2, count($i18nCol->all()));
 
@@ -115,7 +117,7 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $col = new RouteCollection();
         $col->add('contact', new Route('/contact'));
-        $i18nCol = $this->getLoader(I18nRouter::STRATEGY_PREFIX_EXCEPT_DEFAULT)->load($col);
+        $i18nCol = $this->getLoader('prefix_except_default')->load($col);
 
         $this->assertEquals(2, count($i18nCol->all()));
 
@@ -131,13 +133,16 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
         return array(array('custom'), array('prefix'), array('prefix_except_default'));
     }
 
-    private function getLoader($strategy = I18nRouter::STRATEGY_CUSTOM, $redirectToHost = true)
+    private function getLoader($strategy = 'custom')
     {
         $translator = new Translator('en', new MessageSelector());
         $translator->addLoader('yml', new YamlFileLoader());
         $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.de.yml'), 'de', 'routes');
         $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en.yml'), 'en', 'routes');
 
-        return new I18nLoader($translator, new DefaultRouteExclusionStrategy(), array('en', 'de'), 'en', $strategy, sys_get_temp_dir(), $redirectToHost);
+        return new I18nLoader(
+            new DefaultRouteExclusionStrategy(),
+            new DefaultPatternGenerationStrategy($strategy, $translator, array('en', 'de'), sys_get_temp_dir())
+        );
     }
 }
