@@ -263,6 +263,28 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $router->match('/english');
     }
 
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @expectedExceptionMessage The route "news_overview" is not available on the current host "uk.test", but only on these hosts "nl.test, be.test".
+     */
+    public function testMatchThrowsResourceNotFoundWhenContextLocaleNotSetAndPatternOfDifferentLocale()
+    {
+        $router = $this->getNonRedirectingHostMapRouter();
+
+        $router->match('/nieuws');
+    }
+
+    /**
+     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @expectedExceptionMessage The route "dutch_only" is not available on the current host "uk.test", but only on these hosts "nl.test, be.test".
+     */
+    public function testMatchThrowsResourceNotFoundWhenContextLocaleNotSetAndPatternNotActive()
+    {
+        $router = $this->getNonRedirectingHostMapRouter();
+
+        $router->match('/dutch-only');
+    }
+
     private function getRouter($config = 'routing.yml', $translator = null, $redirectToHost = true)
     {
         $container = new Container();
@@ -291,6 +313,13 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
     private function getNonRedirectingHostMapRouter($config = 'routing.yml') {
         $container = new Container();
         $container->set('routing.loader', new YamlFileLoader(new FileLocator(__DIR__.'/Fixture')));
+
+        $requestMock = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $requestMock
+            ->expects($this->any())
+            ->method('getLocale')
+            ->will($this->returnValue('en_UK'));
+        $container->set('request', $requestMock);
 
         $translator = new Translator('en_UK', new MessageSelector());
         $translator->setFallbackLocale('en');
