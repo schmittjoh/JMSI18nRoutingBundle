@@ -143,6 +143,16 @@ class I18nRouter extends Router
      */
     public function match($url)
     {
+        if ($this->hostMap && null === $this->context->getParameter('_locale')) {
+            $request = $this->container->get('request');
+            if (method_exists($request, 'getLocale')) {
+                $locale = $request->getLocale();
+            } else {
+                $locale = $request->getSession()->getLocale();
+            }
+            $this->context->setParameter('_locale', $locale);
+        }
+
         $params = $this->getMatcher()->match($url);
 
         if (false !== $params && isset($params['_locales'])) {
