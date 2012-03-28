@@ -6,6 +6,7 @@
 
     <parameters>
         <parameter key="jms_i18n_routing.router.class">JMS\I18nRoutingBundle\Router\I18nRouter</parameter>
+        <parameter key="jms_i18n_routing.locale_resolver.class">JMS\I18nRoutingBundle\Router\DefaultLocaleResolver</parameter>
         
         <parameter key="jms_i18n_routing.loader.class">JMS\I18nRoutingBundle\Router\I18nLoader</parameter>
         <parameter key="jms_i18n_routing.route_exclusion_strategy.class">JMS\I18nRoutingBundle\Router\DefaultRouteExclusionStrategy</parameter>
@@ -18,7 +19,13 @@
     </parameters>
 
     <services>
+        <service id="jms_i18n_routing.locale_resolver.default" class="%jms_i18n_routing.locale_resolver.class%" public="false" />
+        <service id="jms_i18n_routing.locale_resolver" alias="jms_i18n_routing.locale_resolver.default" public="false" />
+    
         <service id="jms_i18n_routing.router" class="%jms_i18n_routing.router.class%" parent="router.default" public="false">
+            <call method="setLocaleResolver">
+                <argument type="service" id="jms_i18n_routing.locale_resolver" />
+            </call>
             <call method="setI18nLoaderId">
                 <argument>jms_i18n_routing.loader</argument>
             </call>

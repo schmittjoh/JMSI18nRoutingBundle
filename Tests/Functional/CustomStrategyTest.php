@@ -23,7 +23,7 @@ class CustomStrategyTest extends BaseTestCase
     public function testDefaultLocaleIsSetCorrectly()
     {
         $client = $this->createClient(array('config' => 'strategy_custom_with_hosts.yml'), array(
-        	'HTTP_HOST' => 'de.host',
+            'HTTP_HOST' => 'de.host',
         ));
         $client->insulate();
 

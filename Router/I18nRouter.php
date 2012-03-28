@@ -38,12 +38,18 @@ class I18nRouter extends Router
     private $container;
     private $defaultLocale;
     private $redirectToHost = true;
+    private $localeResolver;
 
     public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null, array $defaults = array())
     {
         parent::__construct($container, $resource, $options, $context, $defaults);
 
         $this->container = $container;
+    }
+
+    public function setLocaleResolver(LocaleResolverInterface $resolver)
+    {
+        $this->localeResolver = $resolver;
     }
 
     /**
@@ -145,13 +151,22 @@ class I18nRouter extends Router
     {
         $params = $this->getMatcher()->match($url);
 
-        if (false !== $params && isset($params['_locales'])) {
-            if ( 0 < $pos = strpos($params['_route'], I18nLoader::ROUTING_PREFIX)) {
+        if (false === $params) {
+            return false;
+        }
+
+        if (isset($params['_locales'])) {
+            if (false !== $pos = strpos($params['_route'], I18nLoader::ROUTING_PREFIX)) {
                 $params['_route'] = substr($params['_route'], $pos + strlen(I18nLoader::ROUTING_PREFIX));
             }
 
-            if (($currentLocale = $this->context->getParameter('_locale'))
-                    && !in_array($currentLocale = $this->context->getParameter('_locale'), $params['_locales'], true)) {
+            if (!($currentLocale = $this->context->getParameter('_locale'))
+                    && $this->container->isScopeActive('request')) {
+                $currentLocale = $this->localeResolver->resolveLocale(
+                    $this->container->get('request'), $params['_locales']);
+            }
+
+            if (!in_array($currentLocale, $params['_locales'], true)) {
                 // TODO: We might want to allow the user to be redirected to the route for the given locale if
                 //       it exists regardless of whether it would be on another domain, or the same domain.
                 //       Below we assume that we do not want to redirect always.
@@ -184,12 +199,12 @@ class I18nRouter extends Router
 
             unset($params['_locales']);
             $params['_locale'] = $currentLocale;
-        } else if (false !== $params && isset($params['_locale']) && 0 < $pos = strpos($params['_route'], I18nLoader::ROUTING_PREFIX)) {
+        } else if (isset($params['_locale']) && 0 < $pos = strpos($params['_route'], I18nLoader::ROUTING_PREFIX)) {
             $params['_route'] = substr($params['_route'], $pos + strlen(I18nLoader::ROUTING_PREFIX));
         }
 
         // check if the matched route belongs to a different locale on another host
-        if (false !== $params && isset($params['_locale'])
+        if (isset($params['_locale'])
                 && isset($this->hostMap[$params['_locale']])
                 && $this->context->getHost() !== $host = $this->hostMap[$params['_locale']]) {
             if (!$this->redirectToHost) {

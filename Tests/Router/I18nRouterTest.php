@@ -19,9 +19,7 @@
 namespace JMS\I18nRoutingBundle\Tests\Router;
 
 use JMS\I18nRoutingBundle\Router\DefaultPatternGenerationStrategy;
-
 use JMS\I18nRoutingBundle\Router\DefaultRouteExclusionStrategy;
-
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\Loader\YamlFileLoader as TranslationLoader;
 use Symfony\Component\Translation\MessageSelector;
@@ -34,6 +32,8 @@ use Symfony\Component\Routing\Loader\YamlFileLoader;
 use JMS\I18nRoutingBundle\Router\I18nRouter;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\DependencyInjection\Scope;
 
 class I18nRouterTest extends \PHPUnit_Framework_TestCase
 {
@@ -263,7 +263,31 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $router->match('/english');
     }
 
-    private function getRouter($config = 'routing.yml', $translator = null, $redirectToHost = true)
+    public function testMatchCallsLocaleResolverIfRouteSupportsMultipleLocalesAndContextHasNoLocale()
+    {
+        $localeResolver = $this->getMock('JMS\I18nRoutingBundle\Router\LocaleResolverInterface');
+
+        $router = $this->getRouter('routing.yml', null, $localeResolver);
+        $context = $router->getContext();
+        $context->setParameter('_locale', null);
+
+        $ref = new \ReflectionProperty($router, 'container');
+        $ref->setAccessible(true);
+        $container = $ref->getValue($router);
+        $container->addScope(new Scope('request'));
+        $container->enterScope('request');
+        $container->set('request', $request = Request::create('/'));
+
+        $localeResolver->expects($this->once())
+            ->method('resolveLocale')
+            ->with($request, array('en', 'de', 'fr'))
+            ->will($this->returnValue('de'));
+
+        $params = $router->match('/');
+        $this->assertSame('de', $params['_locale']);
+    }
+
+    private function getRouter($config = 'routing.yml', $translator = null, $localeResolver = null)
     {
         $container = new Container();
         $container->set('routing.loader', new YamlFileLoader(new FileLocator(__DIR__.'/Fixture')));
@@ -281,6 +305,10 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $router = new I18nRouter($container, $config);
         $router->setI18nLoaderId('i18n_loader');
         $router->setDefaultLocale('en');
+
+        if (null !== $localeResolver) {
+            $router->setLocaleResolver($localeResolver);
+        }
 
         return $router;
     }

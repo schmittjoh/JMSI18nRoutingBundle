@@ -64,10 +64,7 @@ class JMSI18nRoutingExtension extends Extension
             ;
 
             $container
-                ->getDefinition('jms_i18n_routing.locale_changing_listener')
-                ->setPublic(true)
-                // this must run after the session listener which has a priority of 128 atm
-                ->addTag('kernel.event_listener', array('event' => 'kernel.request', 'priority' => 120))
+                ->getDefinition('jms_i18n_routing.locale_resolver.default')
                 ->addArgument(array_flip($config['hosts']))
             ;
 

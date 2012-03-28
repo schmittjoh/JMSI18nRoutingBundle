@@ -27,7 +27,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 class DefaultController
 {
     /**
-     * @Route("/")
+     * @Route("/", name = "homepage")
      * @Template
      */
     public function indexAction(Request $request)
