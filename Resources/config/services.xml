@@ -12,7 +12,6 @@
         <parameter key="jms_i18n_routing.route_exclusion_strategy.class">JMS\I18nRoutingBundle\Router\DefaultRouteExclusionStrategy</parameter>
         <parameter key="jms_i18n_routing.pattern_generation_strategy.class">JMS\I18nRoutingBundle\Router\DefaultPatternGenerationStrategy</parameter>
         
-        <parameter key="jms_i18n_routing.locale_changing_listener.class">JMS\I18nRoutingBundle\EventListener\LocaleChangingListener</parameter>
         <parameter key="jms_i18n_routing.locale_choosing_listener.class">JMS\I18nRoutingBundle\EventListener\LocaleChoosingListener</parameter>
         
         <parameter key="jms_i18n_routing.route_translation_extractor.class">JMS\I18nRoutingBundle\Translation\RouteTranslationExtractor</parameter>
@@ -37,7 +36,6 @@
             </call>
         </service>
         
-        <service id="jms_i18n_routing.locale_changing_listener" class="%jms_i18n_routing.locale_changing_listener.class%" public="false" />
         <service id="jms_i18n_routing.locale_choosing_listener" class="%jms_i18n_routing.locale_choosing_listener.class%" public="false">
             <argument>%jms_i18n_routing.default_locale%</argument>
             <argument>%jms_i18n_routing.locales%</argument>
