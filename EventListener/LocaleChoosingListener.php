@@ -68,6 +68,7 @@ class LocaleChoosingListener
         }
 
         $locale = $this->localeResolver->resolveLocale($request, $this->locales) ?: $this->defaultLocale;
+        $request->setLocale($locale);
         $event->setResponse(new RedirectResponse($request->getBaseUrl().'/'.$locale.'/'));
     }
 }

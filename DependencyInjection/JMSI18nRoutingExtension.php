@@ -67,6 +67,12 @@ class JMSI18nRoutingExtension extends Extension
                 ->getDefinition('jms_i18n_routing.locale_resolver.default')
                 ->addArgument(array_flip($config['hosts']))
             ;
+        } else {
+            $container
+                ->getDefinition('jms_i18n_routing.cookie_setting_listener')
+                ->setPublic(true)
+                ->addTag('kernel.event_listener', array('event' => 'kernel.response', 'priority' => 256))
+            ;
         }
 
         // remove route extractor if JMSTranslationBundle is not enabled to avoid any problems

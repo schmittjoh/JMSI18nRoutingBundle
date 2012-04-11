@@ -42,4 +42,19 @@ class PrefixStrategyTest extends BaseTestCase
             array('fr;q=0.5', 'en'),
         );
     }
+
+    public function testLanguageCookieIsSet()
+    {
+        $client = $this->createClient(array('config' => 'strategy_prefix.yml'));
+        $client->insulate();
+
+        $client->request('GET', '/?hl=de');
+
+        $response = $client->getResponse();
+        $this->assertTrue($response->isRedirect('/de/'), (string) $response);
+
+        $cookies = $response->headers->getCookies();
+        $this->assertSame(2, count($cookies));
+        $this->assertSame('de', $cookies[0]->getValue());
+    }
 }
