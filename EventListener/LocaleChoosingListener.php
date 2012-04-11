@@ -18,6 +18,8 @@
 
 namespace JMS\I18nRoutingBundle\EventListener;
 
+use JMS\I18nRoutingBundle\Router\LocaleResolverInterface;
+
 use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -40,11 +42,13 @@ class LocaleChoosingListener
 {
     private $defaultLocale;
     private $locales;
+    private $localeResolver;
 
-    public function __construct($defaultLocale, array $locales)
+    public function __construct($defaultLocale, array $locales, LocaleResolverInterface $localeResolver)
     {
         $this->defaultLocale = $defaultLocale;
         $this->locales = $locales;
+        $this->localeResolver = $localeResolver;
     }
 
     public function onKernelException(GetResponseForExceptionEvent $event)
@@ -63,6 +67,7 @@ class LocaleChoosingListener
             return;
         }
 
-        $event->setResponse(new RedirectResponse($request->getBaseUrl().'/'.$request->getPreferredLanguage(array_merge(array($this->defaultLocale), $this->locales)).$request->getPathInfo()));
+        $locale = $this->localeResolver->resolveLocale($request, $this->locales) ?: $this->defaultLocale;
+        $event->setResponse(new RedirectResponse($request->getBaseUrl().'/'.$locale.'/'));
     }
 }

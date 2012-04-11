@@ -39,6 +39,7 @@
         <service id="jms_i18n_routing.locale_choosing_listener" class="%jms_i18n_routing.locale_choosing_listener.class%" public="false">
             <argument>%jms_i18n_routing.default_locale%</argument>
             <argument>%jms_i18n_routing.locales%</argument>
+            <argument type="service" id="jms_i18n_routing.locale_resolver" />
         </service>
         
         <service id="jms_i18n_routing.route_exclusion_strategy" class="%jms_i18n_routing.route_exclusion_strategy.class%" public="false" />
