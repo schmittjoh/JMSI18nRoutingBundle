@@ -227,11 +227,11 @@ class I18nRouter extends Router
         // if we have no locale set on the route, we try to set one according to the localeResolver
         // if we don't do this all _internal routes will have the default locale on first request
         if (!isset($params['_locale'])
-            && $this->container->isScopeActive('request')) {
-            $params['_locale'] = $this->localeResolver->resolveLocale(
-                $this->container->get('request'),
-                $this->container->getParameter('jms_i18n_routing.locales')
-            );
+                && $this->container->isScopeActive('request')
+                && $locale = $this->localeResolver->resolveLocale(
+                        $this->container->get('request'),
+                        $this->container->getParameter('jms_i18n_routing.locales'))) {
+            $params['_locale'] = $locale;
         }
 
         return $params;
