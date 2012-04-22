@@ -164,6 +164,12 @@ class I18nRouter extends Router
                     && $this->container->isScopeActive('request')) {
                 $currentLocale = $this->localeResolver->resolveLocale(
                     $this->container->get('request'), $params['_locales']);
+
+                // If the locale resolver was not able to determine a locale, then all efforts to
+                // make an informed decision have failed. Just display something as a last resort.
+                if (!$currentLocale) {
+                    $currentLocale = reset($params['_locales']);
+                }
             }
 
             if (!in_array($currentLocale, $params['_locales'], true)) {
