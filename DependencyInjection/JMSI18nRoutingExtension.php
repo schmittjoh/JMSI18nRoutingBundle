@@ -20,8 +20,9 @@ namespace JMS\I18nRoutingBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -74,6 +75,8 @@ class JMSI18nRoutingExtension extends Extension
                 ->addTag('kernel.event_listener', array('event' => 'kernel.response', 'priority' => 256))
             ;
         }
+
+        $container->setAlias('jms_i18n_routing.locale_resolver', new Alias($config['locale_resolver'], false));
 
         // remove route extractor if JMSTranslationBundle is not enabled to avoid any problems
         $bundles = $container->getParameter('kernel.bundles');

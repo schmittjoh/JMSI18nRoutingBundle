@@ -20,7 +20,6 @@
 
     <services>
         <service id="jms_i18n_routing.locale_resolver.default" class="%jms_i18n_routing.locale_resolver.class%" public="false" />
-        <service id="jms_i18n_routing.locale_resolver" alias="jms_i18n_routing.locale_resolver.default" public="false" />
     
         <service id="jms_i18n_routing.router" class="%jms_i18n_routing.router.class%" parent="router.default" public="false">
             <call method="setLocaleResolver">
