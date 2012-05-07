@@ -124,3 +124,21 @@ Resulting URLs::
 
 - /kontakt
 - /contact
+
+Other
+~~~~~
+You can also configure your own locale resolver service. This service should
+implement the ``JMS\I18nRoutingBundle\Router\LocaleResolverInterface``.
+
+.. configuration-block ::
+
+    .. code-block :: yaml
+
+        jms_i18n_routing:
+            locale_resolver: my_custom.locale_resolver_service
+
+    .. code-block :: xml
+
+        <jms-i18n-routing
+            locale-resolver="my_custom.locale_resolver_service" />
+
