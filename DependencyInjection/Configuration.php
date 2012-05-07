@@ -57,6 +57,7 @@ final class Configuration implements ConfigurationInterface
                 ->end()
                 ->children()
                     ->scalarNode('default_locale')->isRequired()->end()
+                    ->scalarNode('locale_resolver')->defaultValue('jms_i18n_routing.locale_resolver.default')->end()
                     ->arrayNode('locales')
                         ->beforeNormalization()
                             ->ifString()
