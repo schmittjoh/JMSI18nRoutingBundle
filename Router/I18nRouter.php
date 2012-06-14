@@ -40,11 +40,20 @@ class I18nRouter extends Router
     private $redirectToHost = true;
     private $localeResolver;
 
-    public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null, array $defaults = array())
+    /**
+     * Constructor.
+     *
+     * The only purpose of this is to make the container available in the sub-class
+     * since it is declared private in the parent class.
+     *
+     * The parameters are not listed explicitly here because they are different for
+     * Symfony 2.0 and 2.1. If we did list them, it would make this class incompatible 
+     * with one of both versions.
+     */
+    public function __construct()
     {
-        parent::__construct($container, $resource, $options, $context, $defaults);
-
-        $this->container = $container;
+        call_user_func_array(array('Symfony\Bundle\FrameworkBundle\Routing\Router', '__construct'), func_get_args());
+        $this->container = func_get_arg(0);
     }
 
     public function setLocaleResolver(LocaleResolverInterface $resolver)
