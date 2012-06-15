@@ -14,13 +14,13 @@ To install JMSI18nRoutingBundle with Composer just add the following to your
         // ...
         require: {
             // ...
-            "jms/i18n-routing-bundle": "master-dev"
+            "jms/i18n-routing-bundle": "dev-master"
         }
     }
     
 .. note ::
 
-    Please replace `master-dev` in the snippet above with the latest stable
+    Please replace `dev-master` in the snippet above with the latest stable
     branch, for example ``1.0.*``.
     
 Then, you can install the new dependencies by running Composer's ``update``
