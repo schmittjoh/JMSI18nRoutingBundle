@@ -16,6 +16,9 @@
         <parameter key="jms_i18n_routing.cookie_setting_listener.class">JMS\I18nRoutingBundle\EventListener\CookieSettingListener</parameter>
         
         <parameter key="jms_i18n_routing.route_translation_extractor.class">JMS\I18nRoutingBundle\Translation\RouteTranslationExtractor</parameter>
+
+        <parameter key="jms_i18n_routing.form.translation_language.class">JMS\I18nRoutingBundle\Form\Extension\Type\TranslationLanguageType</parameter>
+        <parameter key="jms_i18n_routing.form.translation_locale.class">JMS\I18nRoutingBundle\Form\Extension\Type\TranslationLocaleType</parameter>
     </parameters>
 
     <services>
@@ -35,6 +38,20 @@
             <call method="setRedirectToHost">
                 <argument>%jms_i18n_routing.redirect_to_host%</argument>
             </call>
+        </service>
+
+        <service id="form.type.translation_language" class="%jms_i18n_routing.form.translation_language.class%" public="true">
+            <argument>%jms_i18n_routing.default_locale%</argument>
+            <argument>%jms_i18n_routing.locales%</argument>
+            <argument type="service" id="jms_i18n_routing.locale_resolver" />
+            <tag name="form.type" alias="translation_language" />
+        </service>
+
+        <service id="form.type.translation_locale" class="%jms_i18n_routing.form.translation_locale.class%" public="true">
+            <argument>%jms_i18n_routing.default_locale%</argument>
+            <argument>%jms_i18n_routing.locales%</argument>
+            <argument type="service" id="jms_i18n_routing.locale_resolver" />
+            <tag name="form.type" alias="translation_locale" />
         </service>
         
         <service id="jms_i18n_routing.locale_choosing_listener" class="%jms_i18n_routing.locale_choosing_listener.class%" public="false">

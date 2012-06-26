@@ -20,10 +20,20 @@ use Symfony\Component\HttpFoundation\Request;
 class DefaultLocaleResolver implements LocaleResolverInterface
 {
     private $hostMap;
+    private $currentLocale;
 
     public function __construct(array $hostMap = array())
     {
         $this->hostMap = $hostMap;
+        $this->currentLocale = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getCurrentLocale()
+    {
+        return $this->currentLocale;
     }
 
     /**
@@ -32,44 +42,45 @@ class DefaultLocaleResolver implements LocaleResolverInterface
     public function resolveLocale(Request $request, array $availableLocales)
     {
         if ($this->hostMap && isset($this->hostMap[$host = $request->getHost()])) {
-            return $this->hostMap[$host];
+            $this->currentLocale = $this->hostMap[$host];
         }
 
         // if a locale has been specifically set as a query parameter, use it
-        if ($request->query->has('hl')) {
+        elseif ($request->query->has('hl')) {
             $hostLanguage = $request->query->get('hl');
 
             if (preg_match('#^[a-z]{2}(?:_[a-z]{2})?$#i', $hostLanguage)) {
-                return $hostLanguage;
+                $this->currentLocale = $hostLanguage;
             }
         }
 
         // check if a session exists, and if it contains a locale
-        if ($request->hasPreviousSession()) {
+        elseif ($request->hasPreviousSession()) {
             $session = $request->getSession();
             if ($session->has('_locale')) {
-                return $session->get('_locale');
+                $this->currentLocale = $session->get('_locale');
             }
         }
 
         // if user sends a cookie, use it
-        if ($request->cookies->has('hl')) {
+        elseif ($request->cookies->has('hl')) {
             $hostLanguage = $request->cookies->get('hl');
 
             if (preg_match('#^[a-z]{2}(?:_[a-z]{2})?$#i', $hostLanguage)) {
-                return $hostLanguage;
+                $this->currentLocale = $hostLanguage;
             }
         }
 
         // use accept header for locale matching if sent
-        if ($languages = $request->getLanguages()) {
+        elseif ($languages = $request->getLanguages()) {
             foreach ($languages as $lang) {
                 if (in_array($lang, $availableLocales, true)) {
-                    return $lang;
+                    $this->currentLocale = $lang;
+                    break;
                 }
             }
         }
 
-        return null;
+        return $this->currentLocale;
     }
 }

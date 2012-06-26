@@ -23,4 +23,12 @@ interface LocaleResolverInterface
      *                        return a locale which is not available for the matched route
      */
     function resolveLocale(Request $request, array $availableLocales);
+
+    /**
+     * Returns the locale used in this request based on a previous call to resolveLocale method
+     *
+     * @return string|null may return null if no suitable locale is found, may also
+     *                        return a locale which is not available for the matched route
+     */
+    function getCurrentLocale();
 }
