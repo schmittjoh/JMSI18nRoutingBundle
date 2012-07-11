@@ -58,9 +58,10 @@ class JMSI18nRoutingExtension extends Extension
         }
 
         if ($config['hosts']) {
+            $container->setParameter('jms_i18n_routing.hostmap', $config['hosts']);
             $container
                 ->getDefinition('jms_i18n_routing.router')
-                ->addMethodCall('setHostMap', array($config['hosts']))
+                ->addMethodCall('setHostMap', array('%jms_i18n_routing.hostmap%'))
             ;
 
             $container
