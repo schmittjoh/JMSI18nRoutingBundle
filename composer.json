@@ -18,5 +18,10 @@
     "autoload": {
         "psr-0": { "JMS\\I18nRoutingBundle": "" }
     },
-    "target-dir": "JMS/I18nRoutingBundle"
+    "target-dir": "JMS/I18nRoutingBundle",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
 }
