@@ -67,7 +67,7 @@ class JMSI18nRoutingExtension extends Extension
                 ->getDefinition('jms_i18n_routing.locale_resolver.default')
                 ->addArgument(array_flip($config['hosts']))
             ;
-        } else {
+        } elseif ($config['use_cookie'] {
             $container
                 ->getDefinition('jms_i18n_routing.cookie_setting_listener')
                 ->setPublic(true)
