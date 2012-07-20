@@ -39,7 +39,7 @@ class DefaultLocaleResolver implements LocaleResolverInterface
         if ($request->query->has('hl')) {
             $hostLanguage = $request->query->get('hl');
 
-            if (preg_match('#^[a-z]{2}(?:_[a-z]{2})?$#i', $hostLanguage)) {
+            if (preg_match('#^[a-z]{2}(?:_[a-z]{2})?$#i', $hostLanguage) && in_array($hostLanguage,$availableLocales)) {
                 return $hostLanguage;
             }
         }
@@ -56,19 +56,23 @@ class DefaultLocaleResolver implements LocaleResolverInterface
         if ($request->cookies->has('hl')) {
             $hostLanguage = $request->cookies->get('hl');
 
-            if (preg_match('#^[a-z]{2}(?:_[a-z]{2})?$#i', $hostLanguage)) {
+            if (preg_match('#^[a-z]{2}(?:_[a-z]{2})?$#i', $hostLanguage) && in_array($hostLanguage,$availableLocales)) {
                 return $hostLanguage;
             }
         }
 
         // use accept header for locale matching if sent
-        if ($languages = $request->getLanguages()) {
-            foreach ($languages as $lang) {
-                if (in_array($lang, $availableLocales, true)) {
-                    return $lang;
-                }
-            }
-        }
+    	if ($languages = $request->getLanguages()) {
+			foreach ($languages as $lang) {
+				if (in_array($lang, $availableLocales, true)) {
+					return $lang;
+				}else if (preg_match('#^([a-z]{2})_[a-z]{2}?$#i', $lang, $langParts)) {
+					if (in_array($langParts[1], $availableLocales, true)) {
+						return $langParts[1];
+					}
+				}
+			}
+		}
 
         return null;
     }
