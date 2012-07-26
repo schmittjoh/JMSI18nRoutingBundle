@@ -90,6 +90,7 @@ final class Configuration implements ConfigurationInterface
                         ->prototype('scalar')->end()
                     ->end()
                     ->booleanNode('redirect_to_host')->defaultTrue()->end()
+                    ->booleanNode('use_cookie')->defaultTrue()->end()
                 ->end()
             ->end()
         ;
