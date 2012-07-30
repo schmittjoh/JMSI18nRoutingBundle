@@ -69,6 +69,16 @@ class LocaleChoosingListener
 
         $locale = $this->localeResolver->resolveLocale($request, $this->locales) ?: $this->defaultLocale;
         $request->setLocale($locale);
-        $event->setResponse(new RedirectResponse($request->getBaseUrl().'/'.$locale.'/'));
+
+        $qs = $request->getQueryString();
+        //The hl param does not need to be forwarded
+        if ($request->query->has('hl')) {
+            $qs = preg_replace('#hl=[^&]*#', '', $qs);
+        }
+        if (!empty($qs)) {
+            $qs = '?'.$qs;
+        }
+
+        $event->setResponse(new RedirectResponse($request->getBaseUrl().'/'.$locale.'/'.$qs));
     }
 }
