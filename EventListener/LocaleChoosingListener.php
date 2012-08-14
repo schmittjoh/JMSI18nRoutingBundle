@@ -19,14 +19,11 @@
 namespace JMS\I18nRoutingBundle\EventListener;
 
 use JMS\I18nRoutingBundle\Router\LocaleResolverInterface;
-
-use Symfony\Component\HttpFoundation\Response;
-
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
  * Chooses the default locale.
@@ -70,15 +67,9 @@ class LocaleChoosingListener
         $locale = $this->localeResolver->resolveLocale($request, $this->locales) ?: $this->defaultLocale;
         $request->setLocale($locale);
 
-        $qs = $request->getQueryString();
-        //The hl param does not need to be forwarded
-        if ($request->query->has('hl')) {
-            $qs = preg_replace('#hl=[^&]*#', '', $qs);
-        }
-        if (!empty($qs)) {
-            $qs = '?'.$qs;
-        }
+        $params = $request->query->all();
+        unset($params['hl']);
 
-        $event->setResponse(new RedirectResponse($request->getBaseUrl().'/'.$locale.'/'.$qs));
+        $event->setResponse(new RedirectResponse($request->getBaseUrl().'/'.$locale.'/'.($params ? '?'.http_build_query($params) : '')));
     }
 }
