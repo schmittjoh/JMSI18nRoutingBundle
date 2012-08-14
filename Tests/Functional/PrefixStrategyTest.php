@@ -30,8 +30,8 @@ class PrefixStrategyTest extends BaseTestCase
         ));
         $client->insulate();
 
-        $client->request('GET', '/');
-        $this->assertTrue($client->getResponse()->isRedirect('/'.$expectedLocale.'/'), (string) $client->getResponse());
+        $client->request('GET', '/?extra=params');
+        $this->assertTrue($client->getResponse()->isRedirect('/'.$expectedLocale.'/?extra=params'), (string) $client->getResponse());
     }
 
     public function getLocaleChoosingTests()
