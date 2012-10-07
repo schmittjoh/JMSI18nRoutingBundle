@@ -55,6 +55,17 @@ final class Configuration implements ConfigurationInterface
                         return $v;
                     })
                 ->end()
+                ->beforeNormalization()
+                    ->always()
+                    ->then(function($v) {
+                        if (isset($v['use_cookie'])) {
+                            $v['cookie']['enabled'] = $v['use_cookie'];
+                            unset($v['use_cookie']);
+                        }
+
+                        return $v;
+                    })
+                ->end()
                 ->children()
                     ->scalarNode('default_locale')->isRequired()->end()
                     ->arrayNode('locales')
@@ -90,7 +101,19 @@ final class Configuration implements ConfigurationInterface
                         ->prototype('scalar')->end()
                     ->end()
                     ->booleanNode('redirect_to_host')->defaultTrue()->end()
-                    ->booleanNode('use_cookie')->defaultTrue()->end()
+                    ->booleanNode('use_cookie')->defaultTrue()->info('DEPRECATED! Please use: cookie.enabled')->end()
+                    ->arrayNode('cookie')
+                        ->addDefaultsIfNotSet()
+                        ->children()
+                            ->booleanNode('enabled')->defaultTrue()->end()
+                            ->scalarNode('name')->defaultValue('hl')->cannotBeEmpty()->end()
+                            ->scalarNode('lifetime')->defaultValue(31536000)->end()
+                            ->scalarNode('path')->defaultNull('/')->end()
+                            ->scalarNode('domain')->defaultNull('')->end()
+                            ->booleanNode('secure')->defaultFalse()->end()
+                            ->booleanNode('httponly')->defaultFalse()->end()
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;

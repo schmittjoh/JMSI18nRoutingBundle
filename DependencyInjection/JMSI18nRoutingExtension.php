@@ -44,6 +44,7 @@ class JMSI18nRoutingExtension extends Extension
         $container->setParameter('jms_i18n_routing.catalogue', $config['catalogue']);
         $container->setParameter('jms_i18n_routing.strategy', $config['strategy']);
         $container->setParameter('jms_i18n_routing.redirect_to_host', $config['redirect_to_host']);
+        $container->setParameter('jms_i18n_routing.cookie.name', $config['cookie']['name']);
 
         $this->addClassesToCompile(array(
             $container->getDefinition('jms_i18n_routing.router')->getClass(),
@@ -66,11 +67,18 @@ class JMSI18nRoutingExtension extends Extension
 
             $container
                 ->getDefinition('jms_i18n_routing.locale_resolver.default')
+                ->addArgument($config['cookie']['enabled'])
                 ->addArgument(array_flip($config['hosts']))
             ;
-        } elseif ($config['use_cookie']) {
+        } elseif ($config['cookie']['enabled']) {
             $container
                 ->getDefinition('jms_i18n_routing.cookie_setting_listener')
+                ->addArgument($config['cookie']['name'])
+                ->addArgument($config['cookie']['lifetime'])
+                ->addArgument($config['cookie']['path'])
+                ->addArgument($config['cookie']['domain'])
+                ->addArgument($config['cookie']['secure'])
+                ->addArgument($config['cookie']['httponly'])
                 ->setPublic(true)
                 ->addTag('kernel.event_listener', array('event' => 'kernel.response', 'priority' => 256))
             ;
