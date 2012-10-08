@@ -16,6 +16,23 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  */
 class CookieSettingListener
 {
+    private $cookieName;
+    private $cookieLifetime;
+    private $cookiePath;
+    private $cookieDomain;
+    private $cookieSecure;
+    private $cookieHttponly;
+
+    public function __construct($cookieName, $cookieLifetime, $cookiePath, $cookieDomain, $cookieSecure, $cookieHttponly)
+    {
+        $this->cookieName = $cookieName;
+        $this->cookieLifetime = $cookieLifetime;
+        $this->cookiePath = $cookiePath;
+        $this->cookieDomain = $cookieDomain;
+        $this->cookieSecure = $cookieSecure;
+        $this->cookieHttponly = $cookieHttponly;
+    }
+
     public function onKernelResponse(FilterResponseEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
@@ -24,9 +41,9 @@ class CookieSettingListener
 
         $request = $event->getRequest();
 
-        if (!$request->cookies->has('hl')
-                || $request->cookies->get('hl') !== $request->getLocale()) {
-            $event->getResponse()->headers->setCookie(new Cookie('hl', $request->getLocale(), time() + 86400 * 365));
+        if (!$request->cookies->has($this->cookieName)
+                || $request->cookies->get($this->cookieName) !== $request->getLocale()) {
+            $event->getResponse()->headers->setCookie(new Cookie($this->cookieName, $request->getLocale(), time() + $this->cookieLifetime, $this->cookiePath, $this->cookieDomain, $this->cookieSecure, $this->cookieHttponly));
         }
     }
 }
