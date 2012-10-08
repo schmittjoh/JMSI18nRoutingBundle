@@ -19,10 +19,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class DefaultLocaleResolver implements LocaleResolverInterface
 {
+    private $cookieName;
     private $hostMap;
 
-    public function __construct(array $hostMap = array())
+    public function __construct($cookieName, array $hostMap = array())
     {
+        $this->cookieName = $cookieName;
         $this->hostMap = $hostMap;
     }
 
@@ -53,8 +55,8 @@ class DefaultLocaleResolver implements LocaleResolverInterface
         }
 
         // if user sends a cookie, use it
-        if ($request->cookies->has('hl')) {
-            $hostLanguage = $request->cookies->get('hl');
+        if ($request->cookies->has($this->cookieName)) {
+            $hostLanguage = $request->cookies->get($this->cookieName);
 
             if (preg_match('#^[a-z]{2}(?:_[a-z]{2})?$#i', $hostLanguage)) {
                 return $hostLanguage;
