@@ -57,4 +57,18 @@ class PrefixStrategyTest extends BaseTestCase
         $this->assertSame(2, count($cookies));
         $this->assertSame('de', $cookies[0]->getValue());
     }
+
+    public function testNoCookieOnError()
+    {
+        $client = $this->createClient(array('config' => 'strategy_prefix.yml'));
+        $client->insulate();
+
+        $client->request('GET', '/nonexistent');
+
+        $response = $client->getResponse();
+        $this->assertTrue($response->isClientError(), (string) $response);
+
+        $cookies = $response->headers->getCookies();
+        $this->assertSame(1, count($cookies));
+    }
 }
