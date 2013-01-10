@@ -127,6 +127,11 @@ class I18nRouter extends Router
             $this->context->setHost($this->hostMap[$locale]);
         }
 
+        // Remove _locale for non-internal routes avoid its appearance as get parameter
+        if (array_key_exists('_locale', $parameters) && $this->getRouteCollection()->get($locale.I18nLoader::ROUTING_PREFIX.$name)) {
+            unset ($parameters['_locale']);
+        }
+
         try {
             $url = $generator->generate($locale.I18nLoader::ROUTING_PREFIX.$name, $parameters, $absolute);
 
