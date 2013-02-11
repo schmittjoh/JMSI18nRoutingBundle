@@ -40,6 +40,17 @@ Some examples below::
     <a href="{{ path("homepage", {"_locale": "de"}) }}">Deutsch</a>
     <a href="{{ path("homepage", {"_locale": "en"}) }}">English</a>
     
+Leaving routes untranslated
+-------------------------
+If you don't want to translate a single given route, you can disable it:
+
+.. code-block :: yaml
+
+    # app/config/routing.yml
+    homepage:
+        ...
+        options: { i18n: false }
+
 More Resources
 --------------
 
