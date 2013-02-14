@@ -127,6 +127,13 @@ class I18nRouter extends Router
             $this->context->setHost($this->hostMap[$locale]);
         }
 
+        // Remove _locale for non-internal routes to avoid its appearance as GET parameter
+        $localeParameterValue = null;
+        if (array_key_exists('_locale', $parameters)) {
+            $localeParameterValue = $parameters['_locale'];
+            unset ($parameters['_locale']);
+        }
+
         try {
             $url = $generator->generate($locale.I18nLoader::ROUTING_PREFIX.$name, $parameters, $absolute);
 
@@ -143,6 +150,10 @@ class I18nRouter extends Router
             // fallback to default behavior
         }
 
+        // Restore _locale parameter if needed when generating an internal route
+        if ($localeParameterValue) {
+            $parameters['_locale'] = $localeParameterValue;
+        }
         // use the default behavior if no localized route exists
         return $generator->generate($name, $parameters, $absolute);
     }
