@@ -69,6 +69,6 @@ class PrefixStrategyTest extends BaseTestCase
         $this->assertTrue($response->isClientError(), (string) $response);
 
         $cookies = $response->headers->getCookies();
-        $this->assertSame(1, count($cookies));
+        $this->assertSame(0, count($cookies));
     }
 }
