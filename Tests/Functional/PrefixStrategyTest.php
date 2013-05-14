@@ -54,7 +54,7 @@ class PrefixStrategyTest extends BaseTestCase
         $this->assertTrue($response->isRedirect('/de/'), (string) $response);
 
         $cookies = $response->headers->getCookies();
-        $this->assertSame(2, count($cookies));
+        $this->assertCount(1, array_filter($cookies, function($item) { return $item->getName() == 'hl'; }), "Expected a single cookie to contain hl");
         $this->assertSame('de', $cookies[0]->getValue());
     }
 
