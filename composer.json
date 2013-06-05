@@ -1,5 +1,5 @@
 {
-    "name":         "jms/i18n-routing-bundle",
+    "name":         "karser/jms-i18n-routing-bundle",
     "description":  "This bundle allows you to create i18n routes.",
     "keywords":     ["translation","multilanguage","routing"],
     "homepage": "http://jmsyst.com/bundles/JMSI18nRoutingBundle",       
