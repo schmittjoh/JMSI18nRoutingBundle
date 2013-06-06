@@ -24,7 +24,10 @@
         </service>
         <service id="jms_i18n_routing.locale_resolver" alias="jms_i18n_routing.locale_resolver.default" public="false" />
         
-        <service id="jms_i18n_routing.router" class="%jms_i18n_routing.router.class%" parent="router.default" public="false">
+        <service id="jms_i18n_routing.router" class="%jms_i18n_routing.router.class%">
+            <argument type="service" id="service_container" />
+            <argument type="service" id="router.request_context" on-invalid="ignore" />
+            
             <call method="setLocaleResolver">
                 <argument type="service" id="jms_i18n_routing.locale_resolver" />
             </call>
