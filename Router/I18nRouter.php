@@ -169,8 +169,7 @@ class I18nRouter extends Router
                 $params['_route'] = substr($params['_route'], $pos + strlen(I18nLoader::ROUTING_PREFIX));
             }
 
-            if (!($currentLocale = $this->context->getParameter('_locale'))
-                    && $this->container->isScopeActive('request')) {
+            if ($this->container->isScopeActive('request')) {
                 $currentLocale = $this->localeResolver->resolveLocale(
                     $this->container->get('request'), $params['_locales']);
 
