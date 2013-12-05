@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * I18n Router implementation.
@@ -262,5 +263,13 @@ class I18nRouter extends Router
     public function getOriginalRouteCollection()
     {
         return parent::getRouteCollection();
+    }
+    
+    /**
+     * To make compatible with Symfony 2.4+
+     */
+    public function matchRequest(Request $request)
+    {
+        return $this->match($request->getPathInfo());
     }
 }
