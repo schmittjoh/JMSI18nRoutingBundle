@@ -202,7 +202,7 @@ class I18nRouter extends Router
             }
 
             if (!($currentLocale = $this->context->getParameter('_locale'))
-                && $this->container->isScopeActive('request')) {
+                    && $this->container->isScopeActive('request')) {
                 $currentLocale = $this->localeResolver->resolveLocale(
                     $this->container->get('request'), $params['_locales']);
 
@@ -223,8 +223,8 @@ class I18nRouter extends Router
                     // generate host maps
                     $hostMap = $this->hostMap;
                     $availableHosts = array_map(function($locale) use ($hostMap) {
-                            return $hostMap[$locale];
-                        }, $params['_locales']);
+                        return $hostMap[$locale];
+                    }, $params['_locales']);
 
                     $differentHost = true;
                     foreach ($availableHosts as $host) {
@@ -252,8 +252,8 @@ class I18nRouter extends Router
 
         // check if the matched route belongs to a different locale on another host
         if (isset($params['_locale'])
-            && isset($this->hostMap[$params['_locale']])
-            && $this->context->getHost() !== $host = $this->hostMap[$params['_locale']]) {
+                && isset($this->hostMap[$params['_locale']])
+                && $this->context->getHost() !== $host = $this->hostMap[$params['_locale']]) {
             if (!$this->redirectToHost) {
                 throw new ResourceNotFoundException(sprintf(
                     'Resource corresponding to pattern "%s" not found for locale "%s".', $url, $this->getContext()->getParameter('_locale')));
@@ -274,10 +274,10 @@ class I18nRouter extends Router
         // if we have no locale set on the route, we try to set one according to the localeResolver
         // if we don't do this all _internal routes will have the default locale on first request
         if (!isset($params['_locale'])
-            && $this->container->isScopeActive('request')
-            && $locale = $this->localeResolver->resolveLocale(
-                $this->container->get('request'),
-                $this->container->getParameter('jms_i18n_routing.locales'))) {
+                && $this->container->isScopeActive('request')
+                && $locale = $this->localeResolver->resolveLocale(
+                        $this->container->get('request'),
+                        $this->container->getParameter('jms_i18n_routing.locales'))) {
             $params['_locale'] = $locale;
         }
 
