@@ -20,6 +20,7 @@ namespace JMS\I18nRoutingBundle\Router;
 
 use JMS\I18nRoutingBundle\Exception\NotAcceptableLanguageException;
 
+use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -48,7 +49,7 @@ class I18nRouter extends Router
      * since it is declared private in the parent class.
      *
      * The parameters are not listed explicitly here because they are different for
-     * Symfony 2.0 and 2.1. If we did list them, it would make this class incompatible 
+     * Symfony 2.0 and 2.1. If we did list them, it would make this class incompatible
      * with one of both versions.
      */
     public function __construct()
@@ -159,8 +160,38 @@ class I18nRouter extends Router
      */
     public function match($url)
     {
-        $params = $this->getMatcher()->match($url);
+        return $this->matchI18n(parent::match($url), $url);
+    }
 
+    public function getRouteCollection()
+    {
+        $collection = parent::getRouteCollection();
+
+        return $this->container->get($this->i18nLoaderId)->load($collection);
+    }
+
+    public function getOriginalRouteCollection()
+    {
+        return parent::getRouteCollection();
+    }
+
+    /**
+     * To make compatible with Symfony <2.4
+     */
+    public function matchRequest(Request $request)
+    {
+        $matcher = $this->getMatcher();
+        $pathInfo = $request->getPathInfo();
+        if (!$matcher instanceof RequestMatcherInterface) {
+            // fallback to the default UrlMatcherInterface
+            return $this->matchI18n($matcher->match($pathInfo), $pathInfo);
+        }
+
+        return $this->matchI18n($matcher->matchRequest($request), $pathInfo);
+    }
+
+    private function matchI18n(array $params, $url)
+    {
         if (false === $params) {
             return false;
         }
@@ -171,7 +202,7 @@ class I18nRouter extends Router
             }
 
             if (!($currentLocale = $this->context->getParameter('_locale'))
-                    && $this->container->isScopeActive('request')) {
+                && $this->container->isScopeActive('request')) {
                 $currentLocale = $this->localeResolver->resolveLocale(
                     $this->container->get('request'), $params['_locales']);
 
@@ -192,8 +223,8 @@ class I18nRouter extends Router
                     // generate host maps
                     $hostMap = $this->hostMap;
                     $availableHosts = array_map(function($locale) use ($hostMap) {
-                        return $hostMap[$locale];
-                    }, $params['_locales']);
+                            return $hostMap[$locale];
+                        }, $params['_locales']);
 
                     $differentHost = true;
                     foreach ($availableHosts as $host) {
@@ -221,8 +252,8 @@ class I18nRouter extends Router
 
         // check if the matched route belongs to a different locale on another host
         if (isset($params['_locale'])
-                && isset($this->hostMap[$params['_locale']])
-                && $this->context->getHost() !== $host = $this->hostMap[$params['_locale']]) {
+            && isset($this->hostMap[$params['_locale']])
+            && $this->context->getHost() !== $host = $this->hostMap[$params['_locale']]) {
             if (!$this->redirectToHost) {
                 throw new ResourceNotFoundException(sprintf(
                     'Resource corresponding to pattern "%s" not found for locale "%s".', $url, $this->getContext()->getParameter('_locale')));
@@ -243,33 +274,13 @@ class I18nRouter extends Router
         // if we have no locale set on the route, we try to set one according to the localeResolver
         // if we don't do this all _internal routes will have the default locale on first request
         if (!isset($params['_locale'])
-                && $this->container->isScopeActive('request')
-                && $locale = $this->localeResolver->resolveLocale(
-                        $this->container->get('request'),
-                        $this->container->getParameter('jms_i18n_routing.locales'))) {
+            && $this->container->isScopeActive('request')
+            && $locale = $this->localeResolver->resolveLocale(
+                $this->container->get('request'),
+                $this->container->getParameter('jms_i18n_routing.locales'))) {
             $params['_locale'] = $locale;
         }
 
         return $params;
-    }
-
-    public function getRouteCollection()
-    {
-        $collection = parent::getRouteCollection();
-
-        return $this->container->get($this->i18nLoaderId)->load($collection);
-    }
-
-    public function getOriginalRouteCollection()
-    {
-        return parent::getRouteCollection();
-    }
-    
-    /**
-     * To make compatible with Symfony 2.4+
-     */
-    public function matchRequest(Request $request)
-    {
-        return $this->match($request->getPathInfo());
     }
 }
