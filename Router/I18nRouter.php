@@ -20,11 +20,13 @@ namespace JMS\I18nRoutingBundle\Router;
 
 use JMS\I18nRoutingBundle\Exception\NotAcceptableLanguageException;
 
+use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * I18n Router implementation.
@@ -47,7 +49,7 @@ class I18nRouter extends Router
      * since it is declared private in the parent class.
      *
      * The parameters are not listed explicitly here because they are different for
-     * Symfony 2.0 and 2.1. If we did list them, it would make this class incompatible 
+     * Symfony 2.0 and 2.1. If we did list them, it would make this class incompatible
      * with one of both versions.
      */
     public function __construct()
@@ -158,8 +160,38 @@ class I18nRouter extends Router
      */
     public function match($url)
     {
-        $params = $this->getMatcher()->match($url);
+        return $this->matchI18n(parent::match($url), $url);
+    }
 
+    public function getRouteCollection()
+    {
+        $collection = parent::getRouteCollection();
+
+        return $this->container->get($this->i18nLoaderId)->load($collection);
+    }
+
+    public function getOriginalRouteCollection()
+    {
+        return parent::getRouteCollection();
+    }
+
+    /**
+     * To make compatible with Symfony <2.4
+     */
+    public function matchRequest(Request $request)
+    {
+        $matcher = $this->getMatcher();
+        $pathInfo = $request->getPathInfo();
+        if (!$matcher instanceof RequestMatcherInterface) {
+            // fallback to the default UrlMatcherInterface
+            return $this->matchI18n($matcher->match($pathInfo), $pathInfo);
+        }
+
+        return $this->matchI18n($matcher->matchRequest($request), $pathInfo);
+    }
+
+    private function matchI18n(array $params, $url)
+    {
         if (false === $params) {
             return false;
         }
@@ -250,17 +282,5 @@ class I18nRouter extends Router
         }
 
         return $params;
-    }
-
-    public function getRouteCollection()
-    {
-        $collection = parent::getRouteCollection();
-
-        return $this->container->get($this->i18nLoaderId)->load($collection);
-    }
-
-    public function getOriginalRouteCollection()
-    {
-        return parent::getRouteCollection();
     }
 }
