@@ -57,6 +57,14 @@ class JMSI18nRoutingExtension extends Extension
                 ->addTag('kernel.event_listener', array('event' => 'kernel.exception', 'priority' => 128))
             ;
         }
+        
+        if ('prefix_except_default_listener' === $config['strategy']) {
+            $container
+                ->getDefinition('jms_i18n_routing.locale_choosing_except_listener')
+                ->setPublic(true)
+                ->addTag('kernel.event_listener', array('event' => 'kernel.exception', 'priority' => 128))
+            ;
+        }
 
         if ($config['hosts']) {
             $container->setParameter('jms_i18n_routing.hostmap', $config['hosts']);
