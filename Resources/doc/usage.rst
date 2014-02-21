@@ -42,7 +42,7 @@ Some examples below::
     
 Leaving routes untranslated
 -------------------------
-If you don't want to translate a single given route, you can disable it:
+If you don't want to translate a single given route, you can begin the route name with "_" (e.g. "_contact") or disable it in the routing configuration:
 
 .. code-block :: yaml
 
