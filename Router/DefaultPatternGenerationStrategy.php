@@ -51,6 +51,9 @@ class DefaultPatternGenerationStrategy implements PatternGenerationStrategyInter
             if (self::STRATEGY_PREFIX === $this->strategy
                     || (self::STRATEGY_PREFIX_EXCEPT_DEFAULT === $this->strategy && $this->defaultLocale !== $locale)) {
                 $i18nPattern = '/'.$locale.$i18nPattern;
+                if (null !== $route->getOption('i18n_prefix')) {
+                    $i18nPattern = $route->getOption('i18n_prefix').$i18nPattern;
+                }
             }
 
             $patterns[$i18nPattern][] = $locale;

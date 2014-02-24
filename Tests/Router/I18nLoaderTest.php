@@ -128,6 +128,16 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/contact', $en->getPattern());
     }
 
+    public function testLoadAddsPrefix()
+    {
+        $col = new RouteCollection();
+        $col->add('dashboard', new Route('/dashboard', array(), array(), array('i18n_prefix' => '/admin')));
+        $i18nCol = $this->getLoader('prefix')->load($col);
+
+        $en = $i18nCol->get('en__RG__dashboard');
+        $this->assertEquals('/admin/en/dashboard', $en->getPattern());
+    }
+
     public function getStrategies()
     {
         return array(array('custom'), array('prefix'), array('prefix_except_default'));
