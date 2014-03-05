@@ -24,6 +24,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Chooses the default locale.
@@ -40,12 +41,14 @@ class LocaleChoosingListener
     private $defaultLocale;
     private $locales;
     private $localeResolver;
+    private $router;
 
-    public function __construct($defaultLocale, array $locales, LocaleResolverInterface $localeResolver)
+    public function __construct($defaultLocale, array $locales, LocaleResolverInterface $localeResolver, RouterInterface $router)
     {
-        $this->defaultLocale = $defaultLocale;
-        $this->locales = $locales;
+        $this->defaultLocale  = $defaultLocale;
+        $this->locales        = $locales;
         $this->localeResolver = $localeResolver;
+        $this->router         = $router;
     }
 
     public function onKernelException(GetResponseForExceptionEvent $event)
@@ -54,22 +57,42 @@ class LocaleChoosingListener
             return;
         }
 
-        $request = $event->getRequest();
-        if ('' !== rtrim($request->getPathInfo(), '/')) {
-            return;
-        }
-
         $ex = $event->getException();
         if (!$ex instanceof NotFoundHttpException || !$ex->getPrevious() instanceof ResourceNotFoundException) {
             return;
         }
 
-        $locale = $this->localeResolver->resolveLocale($request, $this->locales) ?: $this->defaultLocale;
+        $request = $event->getRequest();
+        $path = rtrim($request->getPathInfo(), '/');
+        if (! $this->pathIsLandingUri($path)) {
+            return;
+        }
+
+        $locale = $this->localeResolver->resolveLocale($request, $this->locales) ? : $this->defaultLocale;
         $request->setLocale($locale);
 
         $params = $request->query->all();
         unset($params['hl']);
 
-        $event->setResponse(new RedirectResponse($request->getBaseUrl().'/'.$locale.'/'.($params ? '?'.http_build_query($params) : '')));
+        $event->setResponse(
+            new RedirectResponse($request->getBaseUrl() . $path . '/' . $locale . '/' . ($params ? '?' . http_build_query(
+                        $params
+                    ) : ''))
+        );
+    }
+
+    private function pathIsLandingUri($path)
+    {
+        if ('' === $path) {
+            return true;
+        }
+
+        foreach ($this->router->getRouteCollection()->getIterator() as $route) {
+            if ($path === $route->getOption('i18n_prefix')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

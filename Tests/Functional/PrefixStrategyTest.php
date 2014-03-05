@@ -34,6 +34,20 @@ class PrefixStrategyTest extends BaseTestCase
         $this->assertTrue($client->getResponse()->isRedirect('/'.$expectedLocale.'/?extra=params'), (string) $client->getResponse());
     }
 
+    /**
+     * @dataProvider getLocaleChoosingTests
+     */
+    public function testLocaleIsChoosenWhenPrefixedPageIsRequested($acceptLanguages, $expectedLocale)
+    {
+        $client = $this->createClient(array('config' => 'strategy_prefix.yml'), array(
+            'HTTP_ACCEPT_LANGUAGE' => $acceptLanguages,
+        ));
+        $client->insulate();
+
+        $client->request('GET', '/prefix?extra=params');
+        $this->assertTrue($client->getResponse()->isRedirect('/prefix/'.$expectedLocale.'/?extra=params'), (string) $client->getResponse());
+    }
+
     public function getLocaleChoosingTests()
     {
         return array(

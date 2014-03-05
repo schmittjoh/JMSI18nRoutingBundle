@@ -37,4 +37,16 @@ class DefaultController
 
         return array('locale' => $locale);
     }
+
+    /**
+     * @Route("/", name = "prefixPage", options={"i18n_prefix": "/prefix"})
+     * @Template
+     */
+    public function prefixAction(Request $request)
+    {
+        $locale = method_exists($request, 'getLocale') ? $request->getLocale()
+            : $request->getSession()->getLocale();
+
+        return array('locale' => $locale);
+    }
 }
