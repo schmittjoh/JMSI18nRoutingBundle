@@ -38,7 +38,7 @@ class DefaultRouteExclusionStrategy implements RouteExclusionStrategyInterface
             return true;
         }
 
-        if (false === $route->getOption('i18n')) {
+        if (false === $route->getOption('i18n') || 'false' === $route->getOption('i18n')) {
             return true;
         }
 
