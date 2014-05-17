@@ -16,6 +16,7 @@ class DefaultPatternGenerationStrategy implements PatternGenerationStrategyInter
 {
     const STRATEGY_PREFIX = 'prefix';
     const STRATEGY_PREFIX_EXCEPT_DEFAULT = 'prefix_except_default';
+    const STRATEGY_PREFIX_EXCEPT_DEFAULT_LISTENER = 'prefix_except_default_listener';
     const STRATEGY_CUSTOM = 'custom';
 
     private $strategy;
@@ -49,7 +50,7 @@ class DefaultPatternGenerationStrategy implements PatternGenerationStrategyInter
 
             // prefix with locale if requested
             if (self::STRATEGY_PREFIX === $this->strategy
-                    || (self::STRATEGY_PREFIX_EXCEPT_DEFAULT === $this->strategy && $this->defaultLocale !== $locale)) {
+                    || (self::STRATEGY_PREFIX_EXCEPT_DEFAULT === $this->strategy && $this->defaultLocale !== $locale) || (self::STRATEGY_PREFIX_EXCEPT_DEFAULT_LISTENER === $this->strategy && $this->defaultLocale !== $locale)) {
                 $i18nPattern = '/'.$locale.$i18nPattern;
                 if (null !== $route->getOption('i18n_prefix')) {
                     $i18nPattern = $route->getOption('i18n_prefix').$i18nPattern;

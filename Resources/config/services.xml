@@ -13,6 +13,7 @@
         <parameter key="jms_i18n_routing.pattern_generation_strategy.class">JMS\I18nRoutingBundle\Router\DefaultPatternGenerationStrategy</parameter>
         
         <parameter key="jms_i18n_routing.locale_choosing_listener.class">JMS\I18nRoutingBundle\EventListener\LocaleChoosingListener</parameter>
+        <parameter key="jms_i18n_routing.locale_choosing_except_listener.class">JMS\I18nRoutingBundle\EventListener\LocaleChoosingExceptListener</parameter>
         <parameter key="jms_i18n_routing.cookie_setting_listener.class">JMS\I18nRoutingBundle\EventListener\CookieSettingListener</parameter>
         
         <parameter key="jms_i18n_routing.route_translation_extractor.class">JMS\I18nRoutingBundle\Translation\RouteTranslationExtractor</parameter>
@@ -40,6 +41,12 @@
         </service>
         
         <service id="jms_i18n_routing.locale_choosing_listener" class="%jms_i18n_routing.locale_choosing_listener.class%" public="false">
+            <argument>%jms_i18n_routing.default_locale%</argument>
+            <argument>%jms_i18n_routing.locales%</argument>
+            <argument type="service" id="jms_i18n_routing.locale_resolver" />
+        </service>
+
+        <service id="jms_i18n_routing.locale_choosing_except_listener" class="%jms_i18n_routing.locale_choosing_except_listener.class%" public="false">
             <argument>%jms_i18n_routing.default_locale%</argument>
             <argument>%jms_i18n_routing.locales%</argument>
             <argument type="service" id="jms_i18n_routing.locale_resolver" />
