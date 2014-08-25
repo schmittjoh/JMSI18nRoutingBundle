@@ -55,6 +55,10 @@ class LocaleChoosingListener
         }
 
         $request = $event->getRequest();
+
+        $locale = $this->localeResolver->resolveLocale($request, $this->locales) ?: $this->defaultLocale;
+        $request->setLocale($locale);
+
         if ('' !== rtrim($request->getPathInfo(), '/')) {
             return;
         }
@@ -63,9 +67,6 @@ class LocaleChoosingListener
         if (!$ex instanceof NotFoundHttpException || !$ex->getPrevious() instanceof ResourceNotFoundException) {
             return;
         }
-
-        $locale = $this->localeResolver->resolveLocale($request, $this->locales) ?: $this->defaultLocale;
-        $request->setLocale($locale);
 
         $params = $request->query->all();
         unset($params['hl']);
