@@ -42,7 +42,7 @@ class DefaultController
     /**
      * @Route("/exception", name="exception")
      */
-    public function exceptionAction(Request $request)
+    public function fakeExceptionAction(Request $request)
     {
         throw new NotFoundHttpException();
     }

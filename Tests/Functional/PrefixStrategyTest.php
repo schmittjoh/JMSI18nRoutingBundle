@@ -72,7 +72,7 @@ class PrefixStrategyTest extends BaseTestCase
         $this->assertSame(1, count($cookies));
     }
 
-    public function testSetsLocaleIfExceptionIsThrown()
+    public function testLocaleIsPreservedAfterException()
     {
         $client = $this->createClient(array('config' => 'strategy_prefix.yml'), array(
             'HTTP_ACCEPT_LANGUAGE' => 'en-us,en;q=0.5',
