@@ -72,7 +72,7 @@ class PrefixStrategyTest extends BaseTestCase
         $this->assertSame(1, count($cookies));
     }
 
-    public function testLocaleIsPreservedAfterException()
+    public function testEnLocaleIsPreservedAfterException()
     {
         $client = $this->createClient(array('config' => 'strategy_prefix.yml'), array(
             'HTTP_ACCEPT_LANGUAGE' => 'en-us,en;q=0.5',
@@ -84,5 +84,19 @@ class PrefixStrategyTest extends BaseTestCase
         $request = $client->getRequest();
 
         $this->assertEquals('en', $request->getLocale());
+    }
+
+    public function testDeLocaleIsPreservedAfterException()
+    {
+        $client = $this->createClient(array('config' => 'strategy_prefix.yml'), array(
+            'HTTP_ACCEPT_LANGUAGE' => 'de;q=1,en;q=0.5',
+        ));
+        $client->insulate();
+
+        $client->request('GET', '/exception');
+
+        $request = $client->getRequest();
+
+        $this->assertEquals('de', $request->getLocale());
     }
 }
