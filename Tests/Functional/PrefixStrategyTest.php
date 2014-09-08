@@ -71,4 +71,18 @@ class PrefixStrategyTest extends BaseTestCase
         $cookies = $response->headers->getCookies();
         $this->assertSame(1, count($cookies));
     }
+
+    public function testSetsLocaleIfExceptionIsThrown()
+    {
+        $client = $this->createClient(array('config' => 'strategy_prefix.yml'), array(
+            'HTTP_ACCEPT_LANGUAGE' => 'en-us,en;q=0.5',
+        ));
+        $client->insulate();
+
+        $client->request('GET', '/exception');
+
+        $request = $client->getRequest();
+
+        $this->assertEqual('en', $request->getLocale());
+    }
 }

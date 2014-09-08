@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class DefaultController
 {
@@ -36,5 +37,13 @@ class DefaultController
             : $request->getSession()->getLocale();
 
         return array('locale' => $locale);
+    }
+
+    /**
+     * @Route("/exception", name="exception")
+     */
+    public function exceptionAction(Request $request)
+    {
+        throw new NotFoundHttpException();
     }
 }
