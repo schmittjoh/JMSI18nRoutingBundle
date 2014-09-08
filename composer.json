@@ -1,8 +1,8 @@
 {
-    "name":         "jms/i18n-routing-bundle",
-    "description":  "This bundle allows you to create i18n routes.",
+    "name":         "audioteka/i18n-routing-bundle",
+    "description":  "This bundle allows you to create i18n routes. It is a fork of jms/i18n-routing-bundle.",
     "keywords":     ["translation","multilanguage","routing"],
-    "homepage": "http://jmsyst.com/bundles/JMSI18nRoutingBundle",       
+    "homepage":     "https://github.com/Audioteka/JMSI18nRoutingBundle",
     "type":         "symfony-bundle",
     "license":      "Apache2",
     "authors": [
