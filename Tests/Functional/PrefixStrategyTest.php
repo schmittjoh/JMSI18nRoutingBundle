@@ -93,7 +93,7 @@ class PrefixStrategyTest extends BaseTestCase
         ));
         $client->insulate();
 
-        $client->request('GET', '/exception');
+        $client->request('GET', '/de/exception');
 
         $request = $client->getRequest();
 
