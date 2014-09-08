@@ -74,12 +74,10 @@ class PrefixStrategyTest extends BaseTestCase
 
     public function testEnLocaleIsPreservedAfterException()
     {
-        $client = $this->createClient(array('config' => 'strategy_prefix.yml'), array(
-            'HTTP_ACCEPT_LANGUAGE' => 'en-us,en;q=0.5',
-        ));
+        $client = $this->createClient(array('config' => 'strategy_prefix.yml'));
         $client->insulate();
 
-        $client->request('GET', '/exception');
+        $client->request('GET', '/exception?hl=en');
 
         $request = $client->getRequest();
 
@@ -88,12 +86,10 @@ class PrefixStrategyTest extends BaseTestCase
 
     public function testDeLocaleIsPreservedAfterException()
     {
-        $client = $this->createClient(array('config' => 'strategy_prefix.yml'), array(
-            'HTTP_ACCEPT_LANGUAGE' => 'de;q=1,en;q=0.5',
-        ));
+        $client = $this->createClient(array('config' => 'strategy_prefix.yml'));
         $client->insulate();
 
-        $client->request('GET', '/de/exception');
+        $client->request('GET', '/exception?hl=de');
 
         $request = $client->getRequest();
 
