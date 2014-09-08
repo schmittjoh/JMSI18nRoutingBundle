@@ -83,6 +83,6 @@ class PrefixStrategyTest extends BaseTestCase
 
         $request = $client->getRequest();
 
-        $this->assertEqual('en', $request->getLocale());
+        $this->assertEquals('en', $request->getLocale());
     }
 }
