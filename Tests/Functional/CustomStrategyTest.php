@@ -32,4 +32,32 @@ class CustomStrategyTest extends BaseTestCase
         $this->assertEquals(1, count($locale = $crawler->filter('#locale')), substr($client->getResponse(), 0, 2000));
         $this->assertEquals('de', $locale->text());
     }
+
+    public function testEnLocaleIsPreservedAfterException()
+    {
+        $client = $this->createClient(array('config' => 'strategy_prefix.yml'), array(
+            'HTTP_HOST' => 'en.host',
+        ));
+        $client->insulate();
+
+        $client->request('GET', '/exception');
+
+        $request = $client->getRequest();
+
+        $this->assertEquals('en', $request->getLocale());
+    }
+
+    public function testDeLocaleIsPreservedAfterException()
+    {
+        $client = $this->createClient(array('config' => 'strategy_prefix.yml'), array(
+            'HTTP_HOST' => 'de.host',
+        ));
+        $client->insulate();
+
+        $client->request('GET', '/exception');
+
+        $request = $client->getRequest();
+
+        $this->assertEquals('de', $request->getLocale());
+    }
 }
