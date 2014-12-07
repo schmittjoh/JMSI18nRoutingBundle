@@ -114,6 +114,7 @@ final class Configuration implements ConfigurationInterface
                             ->booleanNode('httponly')->defaultFalse()->end()
                         ->end()
                     ->end()
+                    ->booleanNode('accept_header_languages')->defaultTrue()->end()
                 ->end()
             ->end()
         ;
