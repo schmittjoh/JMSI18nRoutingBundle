@@ -4,7 +4,7 @@ Usage
 Introduction
 ------------
 You can continue to create routes like you would do normally. In fact,
-during development you don't need to make any special changes to your existing 
+during development you don't need to make any special changes to your existing
 routes to make them translatable.
 
 Translating Routes
@@ -15,7 +15,7 @@ command that is provided by JMSTranslationBundle_:
 .. code-block :: bash
 
     $ php app/console translation:extract de --enable-extractor=jms_i18n_routing # ...
-    
+
 Please refer to the `bundle's documentation`_ for more information.
 
 .. _JMSTranslationBundle: https://github.com/schmittjoh/JMSTranslationBundle
@@ -34,12 +34,12 @@ Some examples below::
 
     <!-- uses locale of the request context to generate the route -->
     <a href="{{ path("contact") }}">Contact</a>
-    
+
     <!-- sometimes it's necessary to generate routes for a locale other than that
          of the request context, then you can pass it explicitly -->
     <a href="{{ path("homepage", {"_locale": "de"}) }}">Deutsch</a>
     <a href="{{ path("homepage", {"_locale": "en"}) }}">English</a>
-    
+
 Leaving routes untranslated
 ---------------------------
 If you don't want to translate a single given route, you can begin the route name with "_" (e.g. "_contact") or disable it in the routing configuration:
@@ -62,12 +62,22 @@ If you want to add a prefix before the _locale string (e.g. /admin/en/dashboard)
         ...
         options: { i18n_prefix: admin }
 
+
+If you are using the "prefix_except_default" strategy and want the prefix to be kept for the default locale (e.g. /admin/dashboard), you can set the "sticky_i18n_prefix" to true.
+
+.. code-block:: yaml
+
+    # app/config/routing.yml
+    dashboard:
+        ...
+        options: { i18n_prefix: admin, sticky_i18n_prefix: true }
+
 More Resources
 --------------
 
 .. toctree ::
     :hidden:
-    
+
     /cookbook/language_switcher
-    
+
 - :doc:`Creating a Language Switcher </cookbook/language_switcher>`
