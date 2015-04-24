@@ -13,8 +13,7 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "symfony/framework-bundle": "~2.1",
-        "jms/translation-bundle": "~1.0"
+        "symfony/framework-bundle": "~2.1"
     },
     "require-dev": {
         "symfony/framework-bundle": "<2.1.5",
@@ -33,6 +32,9 @@
         "sensio/framework-extra-bundle": "<2.1.5",
         "jms/di-extra-bundle": "*"
     },
+    "suggest": {
+        "jms/translation-bundle": "If you want to use the RouteTranslation extractor"
+    }
     "autoload": {
         "psr-0": { "JMS\\I18nRoutingBundle": "" }
     },
