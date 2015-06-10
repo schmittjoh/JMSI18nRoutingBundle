@@ -114,6 +114,7 @@ final class Configuration implements ConfigurationInterface
                             ->booleanNode('httponly')->defaultFalse()->end()
                         ->end()
                     ->end()
+                    ->booleanNode('replace_symfony_router')->defaultTrue()->end()
                 ->end()
             ->end()
         ;
