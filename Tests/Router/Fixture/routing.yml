@@ -8,7 +8,7 @@ welcome:
 
 untranslated_route:
     path: /not-translated
-    
+
 not_available_in_all_locales:
     path: /not-available-in-all-locales
     options: { i18n_locales: [de, en] }
@@ -16,7 +16,7 @@ not_available_in_all_locales:
 login:
     path: /login
     schemes: [https]
-    
+
 login_check:
     path: /this-is-used-for-checking-login
     options: { i18n: false }
@@ -45,3 +45,6 @@ enUK_only:
 
 sub_locale:
     path: /english
+
+multiple_locale:
+    path: /multiple_locale
