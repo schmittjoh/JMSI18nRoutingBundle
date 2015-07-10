@@ -20,6 +20,7 @@ namespace JMS\I18nRoutingBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Changes the Router implementation.
@@ -30,7 +31,26 @@ class SetRouterPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $container->setAlias('router', 'jms_i18n_routing.router');
+        $routerDefinition = $container->findDefinition('router');
+        $class = $routerDefinition->getClass();
+        if (strpos($class, '%') === 0) {
+            $class = $container->getParameter(trim($class, '%'));
+        }
+        if ($class === 'Symfony\Cmf\Component\Routing\ChainRouter') {
+            $calls = $routerDefinition->getMethodCalls();
+            foreach ($calls as $key => &$call) {
+                if ($call[0] === 'add' && isset($call[1][0]) && (string)$call[1][0] === 'router.default') {
+                    $call[1][0] = new Reference('jms_i18n_routing.router');
+                    $routerDefinition->setMethodCalls($calls);
+                    break;
+                }
+            }
+            unset($call);
+            $container->setDefinition('router', $routerDefinition);
+        } else {
+            $container->setAlias('router', 'jms_i18n_routing.router');
+        }
+
 
         $translatorDef = $container->findDefinition('translator');
         if ('%translator.identity.class%' === $translatorDef->getClass()) {
