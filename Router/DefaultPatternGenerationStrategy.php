@@ -44,14 +44,14 @@ class DefaultPatternGenerationStrategy implements PatternGenerationStrategyInter
     {
         $patterns = array();
         foreach ($route->getOption('i18n_locales') ?: $this->locales as $locale) {
-            // Check if translation exists in the translation catalogue to avoid errors being logged by 
+            // Check if translation exists in the translation catalogue to avoid errors being logged by
             // the new LoggingTranslator of Symfony 2.6. However, the LoggingTranslator did not implement
             // the interface until Symfony 2.6.5, so an extra check is needed.
             if ($this->translator instanceof TranslatorBagInterface || $this->translator instanceof LoggingTranslator) {
                 // Check if route is translated.
                 if (!$this->translator->getCatalogue($locale)->has($routeName, $this->translationDomain)) {
                     // No translation found.
-                    $i18nPattern = $route->getPattern();
+                    $i18nPattern = $route->getPath();
                 } else {
                     // Get translation.
                     $i18nPattern = $this->translator->trans($routeName, array(), $this->translationDomain, $locale);
@@ -59,7 +59,7 @@ class DefaultPatternGenerationStrategy implements PatternGenerationStrategyInter
             } else {
                 // if no translation exists, we use the current pattern
                 if ($routeName === $i18nPattern = $this->translator->trans($routeName, array(), $this->translationDomain, $locale)) {
-                    $i18nPattern = $route->getPattern();
+                    $i18nPattern = $route->getPath();
                 }
             }
 
