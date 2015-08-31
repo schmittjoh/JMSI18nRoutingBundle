@@ -46,8 +46,14 @@ class I18nRoutingExtension extends \Twig_Extension
      */
     public function getHreflang(\Twig_Environment $env)
     {
-        $request = $this->requestStack->getMasterRequest();
-        $routeParams = $request->attributes->get('_route_params');
+        if (null === $request = $this->requestStack->getMasterRequest()) {
+            return;
+        }
+
+        if (null === $routeParams = $request->attributes->get('_route_params')) {
+            return;
+        }
+
         if (!isset($routeParams['localized']) || !$routeParams['localized']) {
             return;
         }
