@@ -1,0 +1,5 @@
+
+{% for locale in locales %}
+    {% set arr = routeParams|merge({'_locale':locale}) %}
+    <link rel="alternate" hreflang="{{ locale }}" href="{{ url(route, arr) }}" />
+{% endfor %}

@@ -123,7 +123,7 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $context->setParameter('_locale', 'en');
         $router->setContext($context);
 
-        $this->assertEquals(array('_controller' => 'foo', '_locale' => 'en', '_route' => 'welcome'), $router->match('/welcome-on-our-website'));
+        $this->assertEquals(array('_controller' => 'foo', '_locale' => 'en', '_route' => 'welcome', '_localized' => true), $router->match('/welcome-on-our-website'));
 
         $this->assertEquals(array(
             '_controller' => 'JMS\I18nRoutingBundle\Controller\RedirectController::redirectAction',
@@ -146,19 +146,19 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $router->setContext($context);
 
         // The route should be available for both en_UK and en_US
-        $this->assertEquals(array('_route' => 'news_overview', '_locale' => 'en_US'), $router->match('/news'));
+        $this->assertEquals(array('_route' => 'news_overview', '_locale' => 'en_US', '_localized' => true), $router->match('/news'));
 
         $context->setParameter('_locale', 'en_UK');
         $context->setHost('uk.test');
         $router->setContext($context);
 
         // The route should be available for both en_UK and en_US
-        $this->assertEquals(array('_route' => 'news_overview', '_locale' => 'en_UK'), $router->match('/news'));
+        $this->assertEquals(array('_route' => 'news_overview', '_locale' => 'en_UK', '_localized' => true), $router->match('/news'));
 
         // Tests whether generating a route to a different locale works
         $this->assertEquals('http://nl.test/nieuws', $router->generate('news_overview', array('_locale' => 'nl_NL')));
 
-        $this->assertEquals(array('_route' => 'english_only', '_locale' => 'en_UK'), $router->match('/english-only'));
+        $this->assertEquals(array('_route' => 'english_only', '_locale' => 'en_UK', '_localized' => true), $router->match('/english-only'));
     }
 
     /**
@@ -174,12 +174,12 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $router->setContext($context);
 
         // Test overwrite
-        $this->assertEquals(array('_route' => 'sub_locale', '_locale' => 'en_US'), $router->match('/american'));
+        $this->assertEquals(array('_route' => 'sub_locale', '_locale' => 'en_US', '_localized' => true, '_all_locales'=>array()), $router->match('/american'));
 
         $context->setParameter('_locale', 'en_UK');
         $context->setHost('uk.test');
         $router->setContext($context);
-        $this->assertEquals(array('_route' => 'enUK_only', '_locale' => 'en_UK'), $router->match('/enUK-only'));
+        $this->assertEquals(array('_route' => 'enUK_only', '_locale' => 'en_UK', '_localized' => true, '_all_locales'=>array('en_UK')), $router->match('/enUK-only'));
     }
 
     /**
