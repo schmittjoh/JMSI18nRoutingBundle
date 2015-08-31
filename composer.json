@@ -34,7 +34,7 @@
     },
     "suggest": {
         "jms/translation-bundle": "If you want to use the RouteTranslation extractor"
-    }
+    },
     "autoload": {
         "psr-0": { "JMS\\I18nRoutingBundle": "" }
     },
