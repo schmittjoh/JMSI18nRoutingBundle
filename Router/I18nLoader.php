@@ -63,6 +63,7 @@ class I18nLoader
                     $catchMultipleRoute = clone $route;
                     $catchMultipleRoute->setPath($pattern);
                     $catchMultipleRoute->setDefault('_locales', $locales);
+                    $catchMultipleRoute->setDefault('localized', true);
                     $i18nCollection->add(implode('_', $locales).I18nLoader::ROUTING_PREFIX.$name, $catchMultipleRoute);
                 }
 
@@ -70,6 +71,7 @@ class I18nLoader
                     $localeRoute = clone $route;
                     $localeRoute->setPath($pattern);
                     $localeRoute->setDefault('_locale', $locale);
+                    $localeRoute->setDefault('localized', true);
                     $i18nCollection->add($locale.I18nLoader::ROUTING_PREFIX.$name, $localeRoute);
                 }
             }
