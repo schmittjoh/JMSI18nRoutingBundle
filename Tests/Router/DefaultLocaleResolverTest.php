@@ -24,6 +24,7 @@ class DefaultLocaleResolverTest extends \PHPUnit_Framework_TestCase
         $tests = array();
 
         $tests[] = array(Request::create('http://foo/?hl=de'), array('foo'), 'en', 'Host has precedence before query parameter');
+        $tests[] = array(Request::create('http://bar.foo'), array('foo'), 'en', 'Host as regexp');
         $tests[] = array(Request::create('/?hl=de'), array('foo'), 'de', 'Query parameter is selected');
         $tests[] = array(Request::create('/?hl=de', 'GET', array(), array('hl' => 'en')), array('foo'), 'de', 'Query parameter has precedence before cookie');
 
@@ -63,6 +64,7 @@ class DefaultLocaleResolverTest extends \PHPUnit_Framework_TestCase
         $this->resolver = new DefaultLocaleResolver('hl', array(
             'foo' => 'en',
             'bar' => 'de',
+            '/.*\.foo/' => 'en'
         ));
     }
 }
