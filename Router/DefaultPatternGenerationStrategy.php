@@ -7,6 +7,7 @@ use Symfony\Component\Translation\LoggingTranslator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * The default strategy supports 3 different scenarios, and makes use of the
@@ -44,14 +45,20 @@ class DefaultPatternGenerationStrategy implements PatternGenerationStrategyInter
     {
         $patterns = array();
         foreach ($route->getOption('i18n_locales') ?: $this->locales as $locale) {
-            // Check if translation exists in the translation catalogue to avoid errors being logged by 
+            // Check if translation exists in the translation catalogue to avoid errors being logged by
             // the new LoggingTranslator of Symfony 2.6. However, the LoggingTranslator did not implement
             // the interface until Symfony 2.6.5, so an extra check is needed.
             if ($this->translator instanceof TranslatorBagInterface || $this->translator instanceof LoggingTranslator) {
                 // Check if route is translated.
                 if (!$this->translator->getCatalogue($locale)->has($routeName, $this->translationDomain)) {
                     // No translation found.
-                    $i18nPattern = $route->getPattern();
+                    // getPattern is deprecated since Symfony 2.2 and will be removed in 3.0. Use the getPath() message suppressed.
+                    if (Kernel::VERSION > 2.2) {
+                        $i18nPattern = $route->getPath();
+                    }else {
+                        $i18nPattern = $route->getPattern();
+                    }
+
                 } else {
                     // Get translation.
                     $i18nPattern = $this->translator->trans($routeName, array(), $this->translationDomain, $locale);
@@ -59,7 +66,12 @@ class DefaultPatternGenerationStrategy implements PatternGenerationStrategyInter
             } else {
                 // if no translation exists, we use the current pattern
                 if ($routeName === $i18nPattern = $this->translator->trans($routeName, array(), $this->translationDomain, $locale)) {
-                    $i18nPattern = $route->getPattern();
+                    // getPattern is deprecated since Symfony 2.2 and will be removed in 3.0. Use the getPath() message suppressed.
+                    if (Kernel::VERSION > 2.2) {
+                        $i18nPattern = $route->getPath();
+                    }else {
+                        $i18nPattern = $route->getPattern();
+                    }
                 }
             }
 

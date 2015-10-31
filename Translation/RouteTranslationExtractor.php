@@ -26,6 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 use JMS\TranslationBundle\Model\Message;
 use JMS\TranslationBundle\Model\MessageCatalogue;
 use JMS\TranslationBundle\Translation\ExtractorInterface;
+use Symfony\Component\HttpKernel\Kernel;
 
 class RouteTranslationExtractor implements ExtractorInterface
 {
@@ -57,7 +58,13 @@ class RouteTranslationExtractor implements ExtractorInterface
             }
 
             $message = new Message($name, $this->domain);
-            $message->setDesc($route->getPattern());
+            // getPattern is deprecated since Symfony 2.2 and will be removed in 3.0. Use the getPath() message suppressed.
+            if (Kernel::VERSION > 2.2) {
+                $desc = $route->getPath();
+            } else {
+                $desc = $route->getPattern();
+            }
+            $message->setDesc($desc);
             $catalogue->add($message);
         }
 

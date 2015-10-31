@@ -23,6 +23,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use JMS\I18nRoutingBundle\Util\RouteExtractor;
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * This loader expands all routes which are eligible for i18n.
@@ -61,14 +62,26 @@ class I18nLoader
                 // We still add individual routes for each locale afterwards for faster generation.
                 if (count($locales) > 1) {
                     $catchMultipleRoute = clone $route;
-                    $catchMultipleRoute->setPattern($pattern);
+                    // setPattern is deprecated since Symfony 2.2 and will be removed in 3.0. Use the setPath() message suppressed.
+                    if (Kernel::VERSION > 2.2) {
+                        $catchMultipleRoute->setPath($pattern);
+                    } else {
+                        $catchMultipleRoute->setPattern($pattern);
+                    }
+
                     $catchMultipleRoute->setDefault('_locales', $locales);
                     $i18nCollection->add(implode('_', $locales).I18nLoader::ROUTING_PREFIX.$name, $catchMultipleRoute);
                 }
 
                 foreach ($locales as $locale) {
                     $localeRoute = clone $route;
-                    $localeRoute->setPattern($pattern);
+                    // setPattern is deprecated since Symfony 2.2 and will be removed in 3.0. Use the setPath() message suppressed.
+                    if (Kernel::VERSION > 2.2) {
+                        $localeRoute->setPath($pattern);
+                    } else {
+                        $localeRoute->setPattern($pattern);
+                    }
+
                     $localeRoute->setDefault('_locale', $locale);
                     $i18nCollection->add($locale.I18nLoader::ROUTING_PREFIX.$name, $localeRoute);
                 }
