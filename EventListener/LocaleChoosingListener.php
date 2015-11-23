@@ -70,6 +70,15 @@ class LocaleChoosingListener
         $params = $request->query->all();
         unset($params['hl']);
 
-        $event->setResponse(new RedirectResponse($request->getBaseUrl().'/'.$locale.'/'.($params ? '?'.http_build_query($params) : '')));
+        $response = new RedirectResponse(
+            $request->getBaseUrl() . '/' . $locale . '/' . ($params ? '?'.http_build_query($params) : '')
+        );
+        $response->setPrivate();
+        $response->setMaxAge(0);
+        $response->setSharedMaxAge(0);
+        $response->headers->addCacheControlDirective('must-revalidate', true);
+        $response->headers->addCacheControlDirective('no-store', true);
+
+        $event->setResponse($response);
     }
 }
