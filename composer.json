@@ -1,6 +1,6 @@
 {
     "name":         "jms/i18n-routing-bundle",
-    "description":  "This bundle allows you to create i18n routes.",
+    "description":  "This bundle allows you to create i18n routes. Fork of the jms/i18n-routing-bundle",
     "keywords":     ["translation","multilanguage","routing"],
     "homepage": "http://jmsyst.com/bundles/JMSI18nRoutingBundle",       
     "type":         "symfony-bundle",
@@ -9,28 +9,26 @@
         {
             "name":   "Johannes M. Schmitt",
             "email":  "schmittjoh@gmail.com"
+        },
+        {
+            "name": "Albert Casademont",
+            "email": "albertcasademont@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
-        "symfony/framework-bundle": "~2.2"
+        "symfony/framework-bundle": "~2.3|~3.0"
     },
     "require-dev": {
-        "symfony/framework-bundle": "<2.2.12",
-        "symfony/css-selector": "<2.2.12",
-        "symfony/http-kernel": "<2.2.12",
-        "symfony/validator": "<2.2.12",
-        "symfony/browser-kit": "<2.2.12",
-        "symfony/finder": "<2.2.12",
-        "symfony/form": "<2.2.12",
-        "symfony/yaml": "<2.2.12",
-        "symfony/process": "<2.2.12",
-        "symfony/routing": "<2.2.12",
-        "symfony/http-foundation": "<2.2.12",
-        "symfony/class-loader": "<2.2.12",
-        "symfony/twig-bundle": "<2.2.12",
-        "sensio/framework-extra-bundle": "<2.2.12",
-        "jms/di-extra-bundle": "*"
+        "jms/di-extra-bundle": "*",
+        "sensio/framework-extra-bundle": "*",
+        "symfony/twig-bundle": "*",
+        "symfony/yaml": "*",
+        "symfony/form": "*",
+        "symfony/validator": "*",
+        "symfony/browser-kit": "*",
+        "symfony/css-selector": "*",
+        "symfony/expression-language": "*",
+        "phpunit/phpunit": "~4"
     },
     "suggest": {
         "jms/translation-bundle": "If you want to use the RouteTranslation extractor"
@@ -38,10 +36,5 @@
     "autoload": {
         "psr-0": { "JMS\\I18nRoutingBundle": "" }
     },
-    "target-dir": "JMS/I18nRoutingBundle",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.1-dev"
-        }
-    }
+    "target-dir": "JMS/I18nRoutingBundle"
 }
