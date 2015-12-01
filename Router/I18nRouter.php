@@ -185,15 +185,18 @@ class I18nRouter extends Router
             return false;
         }
 
+        $request = $this->getRequest();
+
         if (isset($params['_locales'])) {
             if (false !== $pos = strpos($params['_route'], I18nLoader::ROUTING_PREFIX)) {
                 $params['_route'] = substr($params['_route'], $pos + strlen(I18nLoader::ROUTING_PREFIX));
             }
 
             if (!($currentLocale = $this->context->getParameter('_locale'))
-                    && $this->container->isScopeActive('request')) {
+                    && null !== $request) {
                 $currentLocale = $this->localeResolver->resolveLocale(
-                    $this->container->get('request'), $params['_locales']);
+                    $request, $params['_locales']
+                );
 
                 // If the locale resolver was not able to determine a locale, then all efforts to
                 // make an informed decision have failed. Just display something as a last resort.
@@ -263,13 +266,28 @@ class I18nRouter extends Router
         // if we have no locale set on the route, we try to set one according to the localeResolver
         // if we don't do this all _internal routes will have the default locale on first request
         if (!isset($params['_locale'])
-                && $this->container->isScopeActive('request')
+                && null !== $request
                 && $locale = $this->localeResolver->resolveLocale(
-                        $this->container->get('request'),
+                        $request,
                         $this->container->getParameter('jms_i18n_routing.locales'))) {
             $params['_locale'] = $locale;
         }
 
         return $params;
+    }
+
+    /**
+     * @return Request|null
+     */
+    private function getRequest()
+    {
+        $request = null;
+        if ($this->container->has('request_stack')) {
+            $request = $this->container->get('request_stack')->getCurrentRequest();
+        } elseif (method_exists($this->container, 'isScopeActive') && $this->container->isScopeActive('request')) {
+            $request = $this->container->get('request');
+        }
+
+        return $request;
     }
 }
