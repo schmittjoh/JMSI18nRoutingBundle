@@ -109,9 +109,10 @@ class I18nRouter extends Router
             $locale = $this->defaultLocale;
         }
 
+        $absolute = self::ABSOLUTE_URL === $referenceType;
+
         // if the locale is changed, and we have a host map, then we need to
         // generate an absolute URL
-        $absolute = false;
         if ($currentLocale && $currentLocale !== $locale && $this->hostMap) {
             $referenceType = self::ABSOLUTE_URL;
             $absolute = true;
