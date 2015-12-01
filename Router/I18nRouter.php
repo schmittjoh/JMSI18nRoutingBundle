@@ -95,15 +95,9 @@ class I18nRouter extends Router
     }
 
     /**
-     * Generates a URL from the given parameters.
-     *
-     * @param  string  $name       The name of the route
-     * @param  array   $parameters An array of parameters
-     * @param  Boolean $absolute   Whether to generate an absolute URL
-     *
-     * @return string The generated URL
+     * {@inheritdoc}
      */
-    public function generate($name, $parameters = array(), $absolute = false)
+    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
         // determine the most suitable locale to use for route generation
         $currentLocale = $this->context->getParameter('_locale');
@@ -118,27 +112,28 @@ class I18nRouter extends Router
         // if the locale is changed, and we have a host map, then we need to
         // generate an absolute URL
         if ($currentLocale && $currentLocale !== $locale && $this->hostMap) {
-            $absolute = true;
+            $referenceType = self::NETWORK_PATH === $referenceType ? self::NETWORK_PATH : self::ABSOLUTE_URL;
         }
+        $needsHost = self::NETWORK_PATH === $referenceType || self::ABSOLUTE_URL === $referenceType;
 
         $generator = $this->getGenerator();
 
-        // if an absolute URL is requested, we set the correct host
-        if ($absolute && $this->hostMap) {
+        // if an absolute or network URL is requested, we set the correct host
+        if ($needsHost && $this->hostMap) {
             $currentHost = $this->context->getHost();
             $this->context->setHost($this->hostMap[$locale]);
         }
 
         try {
-            $url = $generator->generate($locale.I18nLoader::ROUTING_PREFIX.$name, $parameters, $absolute);
+            $url = $generator->generate($locale.I18nLoader::ROUTING_PREFIX.$name, $parameters, $referenceType);
 
-            if ($absolute && $this->hostMap) {
+            if ($needsHost && $this->hostMap) {
                 $this->context->setHost($currentHost);
             }
 
             return $url;
         } catch (RouteNotFoundException $ex) {
-            if ($absolute && $this->hostMap) {
+            if ($needsHost && $this->hostMap) {
                 $this->context->setHost($currentHost);
             }
 
@@ -146,17 +141,11 @@ class I18nRouter extends Router
         }
 
         // use the default behavior if no localized route exists
-        return $generator->generate($name, $parameters, $absolute);
+        return $generator->generate($name, $parameters, $referenceType);
     }
 
     /**
-     * Tries to match a URL with a set of routes.
-     *
-     * Returns false if no route matches the URL.
-     *
-     * @param  string $url URL to be parsed
-     *
-     * @return array|false An array of parameters or false if no route matches
+     * {@inheritdoc}
      */
     public function match($url)
     {

@@ -19,15 +19,9 @@
         "symfony/framework-bundle": "~2.3|~3.0"
     },
     "require-dev": {
-        "jms/di-extra-bundle": "*",
+        "jms/di-extra-bundle": "~1.1",
         "sensio/framework-extra-bundle": "*",
-        "symfony/twig-bundle": "*",
-        "symfony/yaml": "*",
-        "symfony/form": "*",
-        "symfony/validator": "*",
-        "symfony/browser-kit": "*",
-        "symfony/css-selector": "*",
-        "symfony/expression-language": "*",
+        "symfony/symfony": "~2.3|~3.0",
         "phpunit/phpunit": "~4"
     },
     "suggest": {

@@ -20,6 +20,7 @@ namespace JMS\I18nRoutingBundle\Tests\Router;
 
 use JMS\I18nRoutingBundle\Router\DefaultPatternGenerationStrategy;
 use JMS\I18nRoutingBundle\Router\DefaultRouteExclusionStrategy;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\Loader\YamlFileLoader as TranslationLoader;
 use Symfony\Component\Translation\MessageSelector;
@@ -65,16 +66,16 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals('/welcome-on-our-website', $router->generate('welcome'));
-        $this->assertEquals('http://en.host/welcome-on-our-website', $router->generate('welcome', array(), true));
+        $this->assertEquals('http://en.host/welcome-on-our-website', $router->generate('welcome', array(), UrlGeneratorInterface::ABSOLUTE_URL));
 
         $context = new RequestContext();
         $context->setParameter('_locale', 'en');
         $router->setContext($context);
 
         $this->assertEquals('/welcome-on-our-website', $router->generate('welcome'));
-        $this->assertEquals('http://en.host/welcome-on-our-website', $router->generate('welcome', array(), true));
+        $this->assertEquals('http://en.host/welcome-on-our-website', $router->generate('welcome', array(), UrlGeneratorInterface::ABSOLUTE_URL));
         $this->assertEquals('http://de.host/willkommen-auf-unserer-webseite', $router->generate('welcome', array('_locale' => 'de')));
-        $this->assertEquals('http://de.host/willkommen-auf-unserer-webseite', $router->generate('welcome', array('_locale' => 'de'), true));
+        $this->assertEquals('http://de.host/willkommen-auf-unserer-webseite', $router->generate('welcome', array('_locale' => 'de'), UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
     public function testGenerateDoesUseCorrectHostWhenSchemeChanges()
@@ -294,7 +295,7 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
 
         if (null === $translator) {
             $translator = new Translator('en', new MessageSelector());
-            $translator->setFallbackLocale('en');
+            $translator->setFallbackLocales(['en']);
             $translator->addLoader('yml', new TranslationLoader());
             $translator->addResource('yml', __DIR__.'/Fixture/routes.de.yml', 'de', 'routes');
             $translator->addResource('yml', __DIR__.'/Fixture/routes.en.yml', 'en', 'routes');
@@ -321,7 +322,7 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $container->set('routing.loader', new YamlFileLoader(new FileLocator(__DIR__.'/Fixture')));
 
         $translator = new Translator('en_UK', new MessageSelector());
-        $translator->setFallbackLocale('en');
+        $translator->setFallbackLocales(['en']);
         $translator->addLoader('yml', new TranslationLoader());
         $translator->addResource('yml', __DIR__.'/Fixture/routes.en_UK.yml', 'en_UK', 'routes');
         $translator->addResource('yml', __DIR__.'/Fixture/routes.en_US.yml', 'en_US', 'routes');
