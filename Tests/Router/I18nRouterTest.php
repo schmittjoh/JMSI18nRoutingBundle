@@ -34,6 +34,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\Scope;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class I18nRouterTest extends \PHPUnit_Framework_TestCase
 {
@@ -65,16 +66,16 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals('/welcome-on-our-website', $router->generate('welcome'));
-        $this->assertEquals('http://en.host/welcome-on-our-website', $router->generate('welcome', array(), true));
+        $this->assertEquals('http://en.host/welcome-on-our-website', $router->generate('welcome', array(), UrlGeneratorInterface::ABSOLUTE_URL));
 
         $context = new RequestContext();
         $context->setParameter('_locale', 'en');
         $router->setContext($context);
 
         $this->assertEquals('/welcome-on-our-website', $router->generate('welcome'));
-        $this->assertEquals('http://en.host/welcome-on-our-website', $router->generate('welcome', array(), true));
+        $this->assertEquals('http://en.host/welcome-on-our-website', $router->generate('welcome', array(), UrlGeneratorInterface::ABSOLUTE_URL));
         $this->assertEquals('http://de.host/willkommen-auf-unserer-webseite', $router->generate('welcome', array('_locale' => 'de')));
-        $this->assertEquals('http://de.host/willkommen-auf-unserer-webseite', $router->generate('welcome', array('_locale' => 'de'), true));
+        $this->assertEquals('http://de.host/willkommen-auf-unserer-webseite', $router->generate('welcome', array('_locale' => 'de'), UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
     public function testGenerateDoesUseCorrectHostWhenSchemeChanges()
@@ -296,8 +297,8 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
             $translator = new Translator('en', new MessageSelector());
             $translator->setFallbackLocale('en');
             $translator->addLoader('yml', new TranslationLoader());
-            $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.de.yml'), 'de', 'routes');
-            $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en.yml'), 'en', 'routes');
+            $translator->addResource('yml', __DIR__.'/Fixture/routes.de.yml', 'de', 'routes');
+            $translator->addResource('yml', __DIR__.'/Fixture/routes.en.yml', 'en', 'routes');
         }
 
         $container->set('i18n_loader', new I18nLoader(new DefaultRouteExclusionStrategy(), new DefaultPatternGenerationStrategy('custom', $translator, array('en', 'de', 'fr'), sys_get_temp_dir())));
@@ -323,10 +324,10 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $translator = new Translator('en_UK', new MessageSelector());
         $translator->setFallbackLocale('en');
         $translator->addLoader('yml', new TranslationLoader());
-        $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en_UK.yml'), 'en_UK', 'routes');
-        $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en_US.yml'), 'en_US', 'routes');
-        $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.nl.yml'), 'nl', 'routes');
-        $translator->addResource('yml', file_get_contents(__DIR__.'/Fixture/routes.en.yml'), 'en', 'routes');
+        $translator->addResource('yml', __DIR__.'/Fixture/routes.en_UK.yml', 'en_UK', 'routes');
+        $translator->addResource('yml', __DIR__.'/Fixture/routes.en_US.yml', 'en_US', 'routes');
+        $translator->addResource('yml', __DIR__.'/Fixture/routes.nl.yml', 'nl', 'routes');
+        $translator->addResource('yml', __DIR__.'/Fixture/routes.en.yml', 'en', 'routes');
 
         $container->set('i18n_loader', new I18nLoader(new DefaultRouteExclusionStrategy(), new DefaultPatternGenerationStrategy('custom', $translator, array('en_UK', 'en_US', 'nl_NL', 'nl_BE'), sys_get_temp_dir(), 'routes', 'en_UK')));
 

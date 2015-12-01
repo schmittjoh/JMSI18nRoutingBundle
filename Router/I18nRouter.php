@@ -95,15 +95,9 @@ class I18nRouter extends Router
     }
 
     /**
-     * Generates a URL from the given parameters.
-     *
-     * @param  string  $name       The name of the route
-     * @param  array   $parameters An array of parameters
-     * @param  Boolean $absolute   Whether to generate an absolute URL
-     *
-     * @return string The generated URL
+     * {@inheritdoc}
      */
-    public function generate($name, $parameters = array(), $absolute = false)
+    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
         // determine the most suitable locale to use for route generation
         $currentLocale = $this->context->getParameter('_locale');
@@ -115,9 +109,12 @@ class I18nRouter extends Router
             $locale = $this->defaultLocale;
         }
 
+        $absolute = self::ABSOLUTE_URL === $referenceType;
+
         // if the locale is changed, and we have a host map, then we need to
         // generate an absolute URL
         if ($currentLocale && $currentLocale !== $locale && $this->hostMap) {
+            $referenceType = self::ABSOLUTE_URL;
             $absolute = true;
         }
 
@@ -130,7 +127,7 @@ class I18nRouter extends Router
         }
 
         try {
-            $url = $generator->generate($locale.I18nLoader::ROUTING_PREFIX.$name, $parameters, $absolute);
+            $url = $generator->generate($locale.I18nLoader::ROUTING_PREFIX.$name, $parameters, $referenceType);
 
             if ($absolute && $this->hostMap) {
                 $this->context->setHost($currentHost);
@@ -146,7 +143,7 @@ class I18nRouter extends Router
         }
 
         // use the default behavior if no localized route exists
-        return $generator->generate($name, $parameters, $absolute);
+        return $generator->generate($name, $parameters, $referenceType);
     }
 
     /**
