@@ -295,7 +295,7 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
 
         if (null === $translator) {
             $translator = new Translator('en', new MessageSelector());
-            $translator->setFallbackLocales(['en']);
+            $translator->setFallbackLocales(array('en'));
             $translator->addLoader('yml', new TranslationLoader());
             $translator->addResource('yml', __DIR__.'/Fixture/routes.de.yml', 'de', 'routes');
             $translator->addResource('yml', __DIR__.'/Fixture/routes.en.yml', 'en', 'routes');
@@ -322,7 +322,7 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $container->set('routing.loader', new YamlFileLoader(new FileLocator(__DIR__.'/Fixture')));
 
         $translator = new Translator('en_UK', new MessageSelector());
-        $translator->setFallbackLocales(['en']);
+        $translator->setFallbackLocales(array('en'));
         $translator->addLoader('yml', new TranslationLoader());
         $translator->addResource('yml', __DIR__.'/Fixture/routes.en_UK.yml', 'en_UK', 'routes');
         $translator->addResource('yml', __DIR__.'/Fixture/routes.en_US.yml', 'en_US', 'routes');
