@@ -41,7 +41,7 @@ class DefaultLocaleResolver implements LocaleResolverInterface
         if ($request->query->has('hl')) {
             $hostLanguage = $request->query->get('hl');
 
-            if (preg_match('#^[a-z]{2}(?:_[a-z]{2})?$#i', $hostLanguage)) {
+            if (preg_match('#^[a-z]{2}(?:[_-][a-z]{2})?$#i', $hostLanguage)) {
                 return $hostLanguage;
             }
         }
@@ -58,7 +58,7 @@ class DefaultLocaleResolver implements LocaleResolverInterface
         if ($request->cookies->has($this->cookieName)) {
             $hostLanguage = $request->cookies->get($this->cookieName);
 
-            if (preg_match('#^[a-z]{2}(?:_[a-z]{2})?$#i', $hostLanguage)) {
+            if (preg_match('#^[a-z]{2}(?:[_-][a-z]{2})?$#i', $hostLanguage)) {
                 return $hostLanguage;
             }
         }
