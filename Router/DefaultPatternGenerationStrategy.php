@@ -25,16 +25,16 @@ class DefaultPatternGenerationStrategy implements PatternGenerationStrategyInter
     private $translationDomain;
     private $locales;
     private $cacheDir;
-    private $defaultLocale;
+    private $rootLocales;
 
-    public function __construct($strategy, TranslatorInterface $translator, array $locales, $cacheDir, $translationDomain = 'routes', $defaultLocale = 'en')
+    public function __construct($strategy, TranslatorInterface $translator, array $locales, $cacheDir, $translationDomain = 'routes', $rootLocales = ['en'])
     {
         $this->strategy = $strategy;
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;
         $this->locales = $locales;
         $this->cacheDir = $cacheDir;
-        $this->defaultLocale = $defaultLocale;
+        $this->rootLocales = $rootLocales;
     }
 
     /**
@@ -64,8 +64,9 @@ class DefaultPatternGenerationStrategy implements PatternGenerationStrategyInter
             }
 
             // prefix with locale if requested
+            // halil: check if locale is in default locales configuration
             if (self::STRATEGY_PREFIX === $this->strategy
-                || (self::STRATEGY_PREFIX_EXCEPT_DEFAULT === $this->strategy && $this->defaultLocale !== $locale)) {
+                || (self::STRATEGY_PREFIX_EXCEPT_DEFAULT === $this->strategy && !in_array($locale, $this->rootLocales))) {
                 $i18nPattern = '/'.$locale.$i18nPattern;
                 if (null !== $route->getOption('i18n_prefix')) {
                     $i18nPattern = $route->getOption('i18n_prefix').$i18nPattern;

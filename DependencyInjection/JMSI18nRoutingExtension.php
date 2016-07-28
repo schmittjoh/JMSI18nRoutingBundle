@@ -40,6 +40,7 @@ class JMSI18nRoutingExtension extends Extension
         $loader->load('services.xml');
 
         $container->setParameter('jms_i18n_routing.default_locale', $config['default_locale']);
+        $container->setParameter('jms_i18n_routing.root_locales', $config['root_locales']);
         $container->setParameter('jms_i18n_routing.locales', $config['locales']);
         $container->setParameter('jms_i18n_routing.catalogue', $config['catalogue']);
         $container->setParameter('jms_i18n_routing.strategy', $config['strategy']);
