@@ -34,6 +34,9 @@
             <call method="setDefaultLocale">
                 <argument>%jms_i18n_routing.default_locale%</argument>
             </call>
+            <call method="setCheckHost">
+                <argument>%jms_i18n_routing.check_host%</argument>
+            </call>
             <call method="setRedirectToHost">
                 <argument>%jms_i18n_routing.redirect_to_host%</argument>
             </call>

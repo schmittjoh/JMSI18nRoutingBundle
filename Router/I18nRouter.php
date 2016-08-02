@@ -39,6 +39,7 @@ class I18nRouter extends Router
     private $i18nLoaderId;
     private $container;
     private $defaultLocale;
+    private $checkHost = true;
     private $redirectToHost = true;
     private $localeResolver;
 
@@ -61,6 +62,11 @@ class I18nRouter extends Router
     public function setLocaleResolver(LocaleResolverInterface $resolver)
     {
         $this->localeResolver = $resolver;
+    }
+
+    public function setCheckHost($bool)
+    {
+        $this->checkHost = (Boolean) $bool;
     }
 
     /**
@@ -243,7 +249,8 @@ class I18nRouter extends Router
         }
 
         // check if the matched route belongs to a different locale on another host
-        if (isset($params['_locale'])
+        if ($this->checkHost
+                && isset($params['_locale'])
                 && isset($this->hostMap[$params['_locale']])
                 && $this->context->getHost() !== $host = $this->hostMap[$params['_locale']]) {
             if (!$this->redirectToHost) {

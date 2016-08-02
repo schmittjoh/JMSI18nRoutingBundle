@@ -100,6 +100,7 @@ final class Configuration implements ConfigurationInterface
                         ->useAttributeAsKey('locale')
                         ->prototype('scalar')->end()
                     ->end()
+                    ->booleanNode('check_host')->defaultTrue()->end()
                     ->booleanNode('redirect_to_host')->defaultTrue()->end()
                     ->booleanNode('use_cookie')->defaultTrue()->info('DEPRECATED! Please use: cookie.enabled')->end()
                     ->arrayNode('cookie')
