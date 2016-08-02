@@ -72,6 +72,7 @@ Resulting URLs::
             hosts:
                 en: foo.com
                 de: foo.de 
+            check_host: true
             redirect_to_host: true
     
     .. code-block :: xml
@@ -80,6 +81,7 @@ Resulting URLs::
             default-locale="en" 
             locales="en, de" 
             strategy="custom"
+            check-host="true"
             redirect-to-host="true">
             
             <host locale="en">foo.com</host>
