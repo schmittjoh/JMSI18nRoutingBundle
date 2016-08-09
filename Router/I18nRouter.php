@@ -22,6 +22,7 @@ use JMS\I18nRoutingBundle\Exception\NotAcceptableLanguageException;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -37,8 +38,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class I18nRouter extends Router implements LoggerAwareInterface
 {
-    use LoggerAwareTrait;
-
     private $hostMap = array();
     private $i18nLoaderId;
     private $container;
@@ -306,5 +305,16 @@ class I18nRouter extends Router implements LoggerAwareInterface
         }
 
         return $request;
+    }
+
+
+    /**
+     * Sets a logger.
+     *
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 }
