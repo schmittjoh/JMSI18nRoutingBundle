@@ -44,7 +44,7 @@ class DefaultPatternGenerationStrategy implements PatternGenerationStrategyInter
     {
         $patterns = array();
         foreach ($route->getOption('i18n_locales') ?: $this->locales as $locale) {
-            // Check if translation exists in the translation catalogue to avoid errors being logged by 
+            // Check if translation exists in the translation catalogue to avoid errors being logged by
             // the new LoggingTranslator of Symfony 2.6. However, the LoggingTranslator did not implement
             // the interface until Symfony 2.6.5, so an extra check is needed.
             if ($this->translator instanceof TranslatorBagInterface || $this->translator instanceof LoggingTranslator) {
