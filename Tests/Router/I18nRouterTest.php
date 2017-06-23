@@ -34,7 +34,6 @@ use JMS\I18nRoutingBundle\Router\I18nRouter;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\DependencyInjection\Scope;
 
 class I18nRouterTest extends \PHPUnit_Framework_TestCase
 {
@@ -275,9 +274,17 @@ class I18nRouterTest extends \PHPUnit_Framework_TestCase
         $ref = new \ReflectionProperty($router, 'container');
         $ref->setAccessible(true);
         $container = $ref->getValue($router);
-        $container->addScope(new Scope('request'));
-        $container->enterScope('request');
-        $container->set('request', $request = Request::create('/'));
+        $request = Request::create('/');
+
+        if (method_exists($container, 'addScope')) {
+            $container->addScope(new \Symfony\Component\DependencyInjection\Scope('request'));
+            $container->enterScope('request');
+            $container->set('request', $request);
+        } else {
+            $requestStack = new \Symfony\Component\HttpFoundation\RequestStack();
+            $requestStack->push($request);
+            $container->set('request_stack', $requestStack);
+        }
 
         $localeResolver->expects($this->once())
             ->method('resolveLocale')
