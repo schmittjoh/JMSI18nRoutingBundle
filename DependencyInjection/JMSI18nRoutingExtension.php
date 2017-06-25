@@ -45,6 +45,7 @@ class JMSI18nRoutingExtension extends Extension
         $container->setParameter('jms_i18n_routing.strategy', $config['strategy']);
         $container->setParameter('jms_i18n_routing.redirect_to_host', $config['redirect_to_host']);
         $container->setParameter('jms_i18n_routing.cookie.name', $config['cookie']['name']);
+        $container->setParameter('jms_i18n_routing.replace_symfony_router', $config['replace_symfony_router']);
 
         if (PHP_VERSION_ID < 70000) {
             $this->addClassesToCompile(array(

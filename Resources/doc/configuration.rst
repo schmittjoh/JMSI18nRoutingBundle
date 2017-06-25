@@ -6,7 +6,7 @@ at any time.
 
 .. note ::
 
-    You need to manually clear your cache when switching between different 
+    You need to manually clear your cache when switching between different
     strategies.
 
 1. Scenario: Prefixing All Routes With The Locale
@@ -20,9 +20,9 @@ at any time.
             default_locale: en
             locales: [en, de]
             strategy: prefix
-            
+
     .. code-block :: xml
-    
+
         <jms-i18n-routing
             default-locale="en"
             locales="en, de"
@@ -47,12 +47,12 @@ Resulting URLs::
             strategy: prefix_except_default
 
     .. code-block :: xml
-    
+
         <jms-i18n-routing
             default-locale="en"
             locales="de, en"
             strategy="prefix_except_default" />
-        
+
 Resulting URLs::
 
 - /de/kontakt
@@ -71,24 +71,24 @@ Resulting URLs::
             strategy: custom
             hosts:
                 en: foo.com
-                de: foo.de 
+                de: foo.de
             redirect_to_host: true
-    
+
     .. code-block :: xml
-    
-        <jms-i18n-routing 
-            default-locale="en" 
-            locales="en, de" 
+
+        <jms-i18n-routing
+            default-locale="en"
+            locales="en, de"
             strategy="custom"
             redirect-to-host="true">
-            
+
             <host locale="en">foo.com</host>
             <host locale="de">foo.de</host>
-            
+
         </jms-i18n-routing>
 
-Whenever a pattern is matched to a different host's locale a redirect is used, 
-unless ``redirect_to_host`` is set to false, in which case a ``ResourceNotFoundException`` 
+Whenever a pattern is matched to a different host's locale a redirect is used,
+unless ``redirect_to_host`` is set to false, in which case a ``ResourceNotFoundException``
 is thrown which typically results in a 404 error.
 
 Resulting URLs::
@@ -107,14 +107,14 @@ Resulting URLs::
 .. configuration-block ::
 
     .. code-block :: yaml
-    
+
         jms_i18n_routing:
             default_locale: en
             locales: [en, de]
             strategy: custom
-            
+
     .. code-block :: xml
-    
+
         <jms-i18n-routing
             default-locale="en"
             locales="en, de"
@@ -124,3 +124,28 @@ Resulting URLs::
 
 - /kontakt
 - /contact
+
+5. Scenario: Don't override the Symfony Router
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you don't want the JMSi18nBundle-router overriding Symfony's default router (eg.: when you're
+working with multiple routers), add this option to your configuration. (Standard = true)
+
+.. configuration-block ::
+
+    .. code-block :: yaml
+
+        jms_i18n_routing:
+            default_locale: en
+            locales: [en, de]
+            strategy: prefix
+            replace_symfony_router: false
+
+    .. code-block :: xml
+
+        <jms-i18n-routing
+            default-locale="en"
+            locales="en, de"
+            strategy="prefix"
+            replace_symfony_router="false" />
+
