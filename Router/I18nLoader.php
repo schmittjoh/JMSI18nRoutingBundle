@@ -35,11 +35,16 @@ class I18nLoader
 
     private $routeExclusionStrategy;
     private $patternGenerationStrategy;
+    private $allLocales;
 
-    public function __construct(RouteExclusionStrategyInterface $routeExclusionStrategy, PatternGenerationStrategyInterface $patternGenerationStrategy)
-    {
+    public function __construct(
+        RouteExclusionStrategyInterface $routeExclusionStrategy,
+        PatternGenerationStrategyInterface $patternGenerationStrategy,
+        array $allLocales = array()
+    ) {
         $this->routeExclusionStrategy = $routeExclusionStrategy;
         $this->patternGenerationStrategy = $patternGenerationStrategy;
+        $this->allLocales = $allLocales;
     }
 
     public function load(RouteCollection $collection)
@@ -56,6 +61,10 @@ class I18nLoader
                 continue;
             }
 
+            if (null === $allLocalesForRoute = $route->getOption('i18n_locales')) {
+                $allLocalesForRoute = $this->allLocales;
+            }
+
             foreach ($this->patternGenerationStrategy->generateI18nPatterns($name, $route) as $pattern => $locales) {
                 // If this pattern is used for more than one locale, we need to keep the original route.
                 // We still add individual routes for each locale afterwards for faster generation.
@@ -63,6 +72,7 @@ class I18nLoader
                     $catchMultipleRoute = clone $route;
                     $catchMultipleRoute->setPath($pattern);
                     $catchMultipleRoute->setDefault('_locales', $locales);
+                    $catchMultipleRoute->setDefault('_localized', true);
                     $i18nCollection->add(implode('_', $locales).I18nLoader::ROUTING_PREFIX.$name, $catchMultipleRoute);
                 }
 
@@ -70,6 +80,8 @@ class I18nLoader
                     $localeRoute = clone $route;
                     $localeRoute->setPath($pattern);
                     $localeRoute->setDefault('_locale', $locale);
+                    $localeRoute->setDefault('_all_locales', $allLocalesForRoute);
+                    $localeRoute->setDefault('_localized', true);
                     $i18nCollection->add($locale.I18nLoader::ROUTING_PREFIX.$name, $localeRoute);
                 }
             }
