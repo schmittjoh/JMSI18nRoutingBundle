@@ -54,7 +54,7 @@ class PrefixStrategyTest extends BaseTestCase
         $this->assertTrue($response->isRedirect('/de/'), (string) $response);
 
         $cookies = $response->headers->getCookies();
-        $this->assertSame(2, count($cookies));
+        $this->assertSame(1, count($cookies));
         $this->assertSame('de', $cookies[0]->getValue());
     }
 
@@ -69,6 +69,6 @@ class PrefixStrategyTest extends BaseTestCase
         $this->assertTrue($response->isClientError(), (string) $response);
 
         $cookies = $response->headers->getCookies();
-        $this->assertSame(1, count($cookies));
+        $this->assertSame(0, count($cookies));
     }
 }

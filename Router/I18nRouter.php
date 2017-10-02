@@ -95,15 +95,9 @@ class I18nRouter extends Router
     }
 
     /**
-     * Generates a URL from the given parameters.
-     *
-     * @param  string  $name       The name of the route
-     * @param  array   $parameters An array of parameters
-     * @param  Boolean $absolute   Whether to generate an absolute URL
-     *
-     * @return string The generated URL
+     * {@inheritdoc}
      */
-    public function generate($name, $parameters = array(), $absolute = false)
+    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
         // determine the most suitable locale to use for route generation
         $currentLocale = $this->context->getParameter('_locale');
@@ -118,27 +112,28 @@ class I18nRouter extends Router
         // if the locale is changed, and we have a host map, then we need to
         // generate an absolute URL
         if ($currentLocale && $currentLocale !== $locale && $this->hostMap) {
-            $absolute = true;
+            $referenceType = self::NETWORK_PATH === $referenceType ? self::NETWORK_PATH : self::ABSOLUTE_URL;
         }
+        $needsHost = self::NETWORK_PATH === $referenceType || self::ABSOLUTE_URL === $referenceType;
 
         $generator = $this->getGenerator();
 
-        // if an absolute URL is requested, we set the correct host
-        if ($absolute && $this->hostMap) {
+        // if an absolute or network URL is requested, we set the correct host
+        if ($needsHost && $this->hostMap) {
             $currentHost = $this->context->getHost();
             $this->context->setHost($this->hostMap[$locale]);
         }
 
         try {
-            $url = $generator->generate($locale.I18nLoader::ROUTING_PREFIX.$name, $parameters, $absolute);
+            $url = $generator->generate($locale.I18nLoader::ROUTING_PREFIX.$name, $parameters, $referenceType);
 
-            if ($absolute && $this->hostMap) {
+            if ($needsHost && $this->hostMap) {
                 $this->context->setHost($currentHost);
             }
 
             return $url;
         } catch (RouteNotFoundException $ex) {
-            if ($absolute && $this->hostMap) {
+            if ($needsHost && $this->hostMap) {
                 $this->context->setHost($currentHost);
             }
 
@@ -146,17 +141,11 @@ class I18nRouter extends Router
         }
 
         // use the default behavior if no localized route exists
-        return $generator->generate($name, $parameters, $absolute);
+        return $generator->generate($name, $parameters, $referenceType);
     }
 
     /**
-     * Tries to match a URL with a set of routes.
-     *
-     * Returns false if no route matches the URL.
-     *
-     * @param  string $url URL to be parsed
-     *
-     * @return array|false An array of parameters or false if no route matches
+     * {@inheritdoc}
      */
     public function match($url)
     {
@@ -196,15 +185,18 @@ class I18nRouter extends Router
             return false;
         }
 
+        $request = $this->getRequest();
+
         if (isset($params['_locales'])) {
             if (false !== $pos = strpos($params['_route'], I18nLoader::ROUTING_PREFIX)) {
                 $params['_route'] = substr($params['_route'], $pos + strlen(I18nLoader::ROUTING_PREFIX));
             }
 
             if (!($currentLocale = $this->context->getParameter('_locale'))
-                    && $this->container->isScopeActive('request')) {
+                    && null !== $request) {
                 $currentLocale = $this->localeResolver->resolveLocale(
-                    $this->container->get('request'), $params['_locales']);
+                    $request, $params['_locales']
+                );
 
                 // If the locale resolver was not able to determine a locale, then all efforts to
                 // make an informed decision have failed. Just display something as a last resort.
@@ -274,13 +266,28 @@ class I18nRouter extends Router
         // if we have no locale set on the route, we try to set one according to the localeResolver
         // if we don't do this all _internal routes will have the default locale on first request
         if (!isset($params['_locale'])
-                && $this->container->isScopeActive('request')
+                && null !== $request
                 && $locale = $this->localeResolver->resolveLocale(
-                        $this->container->get('request'),
+                        $request,
                         $this->container->getParameter('jms_i18n_routing.locales'))) {
             $params['_locale'] = $locale;
         }
 
         return $params;
+    }
+
+    /**
+     * @return Request|null
+     */
+    private function getRequest()
+    {
+        $request = null;
+        if ($this->container->has('request_stack')) {
+            $request = $this->container->get('request_stack')->getCurrentRequest();
+        } elseif (method_exists($this->container, 'isScopeActive') && $this->container->isScopeActive('request')) {
+            $request = $this->container->get('request');
+        }
+
+        return $request;
     }
 }

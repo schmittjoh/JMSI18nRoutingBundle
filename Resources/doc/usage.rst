@@ -19,7 +19,7 @@ command that is provided by JMSTranslationBundle_:
 Please refer to the `bundle's documentation`_ for more information.
 
 .. _JMSTranslationBundle: https://github.com/schmittjoh/JMSTranslationBundle
-.. _bundle's documentation: https://jmsyst.com/bundles/JMSTranslationBundle
+.. _bundle's documentation: http://jmsyst.com/bundles/JMSTranslationBundle
 
 Generating Routes
 -----------------

@@ -57,7 +57,7 @@ class RouteTranslationExtractor implements ExtractorInterface
             }
 
             $message = new Message($name, $this->domain);
-            $message->setDesc($route->getPattern());
+            $message->setDesc($route->getPath());
             $catalogue->add($message);
         }
 

@@ -51,7 +51,7 @@ class DefaultPatternGenerationStrategy implements PatternGenerationStrategyInter
                 // Check if route is translated.
                 if (!$this->translator->getCatalogue($locale)->has($routeName, $this->translationDomain)) {
                     // No translation found.
-                    $i18nPattern = $route->getPattern();
+                    $i18nPattern = $route->getPath();
                 } else {
                     // Get translation.
                     $i18nPattern = $this->translator->trans($routeName, array(), $this->translationDomain, $locale);
@@ -59,7 +59,7 @@ class DefaultPatternGenerationStrategy implements PatternGenerationStrategyInter
             } else {
                 // if no translation exists, we use the current pattern
                 if ($routeName === $i18nPattern = $this->translator->trans($routeName, array(), $this->translationDomain, $locale)) {
-                    $i18nPattern = $route->getPattern();
+                    $i18nPattern = $route->getPath();
                 }
             }
 

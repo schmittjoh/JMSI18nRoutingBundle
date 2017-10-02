@@ -1,47 +1,47 @@
 homepage:
-    pattern: /
+    path: /
     defaults: { _controller: bar }
 
 welcome:
-    pattern: /welcome
+    path: /welcome
     defaults: { _controller: foo }
 
 untranslated_route:
-    pattern: /not-translated
+    path: /not-translated
     
 not_available_in_all_locales:
-    pattern: /not-available-in-all-locales
+    path: /not-available-in-all-locales
     options: { i18n_locales: [de, en] }
 
 login:
-    pattern: /login
-    requirements: { _scheme: https }
+    path: /login
+    schemes: [https]
     
 login_check:
-    pattern: /this-is-used-for-checking-login
+    path: /this-is-used-for-checking-login
     options: { i18n: false }
 
 non_i18n_route:
-    pattern: /non-i18n-route
+    path: /non-i18n-route
     options: { i18n: false }
 
 _internal:
-    pattern: /internal
+    path: /internal
 
 news_overview:
-    pattern: /news
+    path: /news
 
 english_only:
-    pattern: /english-only
+    path: /english-only
     options: { i18n_locales: [en_UK, en_US] }
 
 dutch_only:
-    pattern: /dutch-only
+    path: /dutch-only
     options: { i18n_locales: [nl_NL, nl_BE] }
 
 enUK_only:
-    pattern: /enUK-only
+    path: /enUK-only
     options: { i18n_locales: [en_UK] }
 
 sub_locale:
-    pattern: /english
+    path: /english
