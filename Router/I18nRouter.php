@@ -20,6 +20,9 @@ namespace JMS\I18nRoutingBundle\Router;
 
 use JMS\I18nRoutingBundle\Exception\NotAcceptableLanguageException;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -33,7 +36,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class I18nRouter extends Router
+class I18nRouter extends Router implements LoggerAwareInterface
 {
     private $hostMap = array();
     private $i18nLoaderId;
@@ -140,8 +143,21 @@ class I18nRouter extends Router
             // fallback to default behavior
         }
 
-        // use the default behavior if no localized route exists
-        return $generator->generate($name, $parameters, $referenceType);
+        try {
+            // use the default behavior if no localized route exists
+            return $generator->generate($name, $parameters, $referenceType);
+        } catch (\Exception $e) {
+            if ($this->logger) {
+                $this->logger->critical('JMSRouter tried to generate a route', [
+                    'category'=>'routing',
+                    'name'=>$name,
+                    'parameters'=>json_encode($parameters),
+                    'absolute'=>$absolute ? 'true' : 'false',
+                ]);
+            }
+
+            throw $e;
+        }
     }
 
     /**
@@ -289,5 +305,16 @@ class I18nRouter extends Router
         }
 
         return $request;
+    }
+
+
+    /**
+     * Sets a logger.
+     *
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 }
