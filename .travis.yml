@@ -15,9 +15,12 @@ matrix:
         - php: 5.5
         - php: 5.6
         - php: 7.0
+        - php: 7.1
+          env: DEPENDENCIES='beta'
     fast_finish: true
 
 before_install:
+  - if [ "$DEPENDENCIES" = "beta" ]; then composer config minimum-stability beta; fi;
   - if ! [[ "$TRAVIS_PHP_VERSION" == hhvm* ]]; then echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; fi;
   - composer self-update
   - if ! [[ "$TRAVIS_PHP_VERSION" == hhvm* ]]; then phpenv config-rm xdebug.ini; fi;
