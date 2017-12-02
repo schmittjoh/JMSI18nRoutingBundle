@@ -2,12 +2,12 @@
 
 namespace JMS\I18nRoutingBundle\Tests\Router;
 
-use Symfony\Component\HttpKernel\Kernel;
+use PHPUnit\Framework\TestCase;
 
 use JMS\I18nRoutingBundle\Router\DefaultLocaleResolver;
 use Symfony\Component\HttpFoundation\Request;
 
-class DefaultLocaleResolverTest extends \PHPUnit_Framework_TestCase
+class DefaultLocaleResolverTest extends TestCase
 {
     private $resolver;
 
@@ -27,7 +27,7 @@ class DefaultLocaleResolverTest extends \PHPUnit_Framework_TestCase
         $tests[] = array(Request::create('/?hl=de'), array('foo'), 'de', 'Query parameter is selected');
         $tests[] = array(Request::create('/?hl=de', 'GET', array(), array('hl' => 'en')), array('foo'), 'de', 'Query parameter has precedence before cookie');
 
-        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
+        $session = $this->createMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
         $session->expects($this->any())
             ->method('has')
             ->with('_locale')

@@ -37,12 +37,4 @@ class BaseTestCase extends WebTestCase
         $fs = new Filesystem();
         $fs->remove(sys_get_temp_dir().'/JMSI18nRoutingBundle');
     }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-//         $fs = new Filesystem();
-//         $fs->remove(sys_get_temp_dir().'/JMSI18nRoutingBundle');
-    }
 }

@@ -1,6 +1,6 @@
 {
     "name":         "jms/i18n-routing-bundle",
-    "description":  "This bundle allows you to create i18n routes. Fork of the jms/i18n-routing-bundle",
+    "description":  "This bundle allows you to create i18n routes.",
     "keywords":     ["translation","multilanguage","routing"],
     "homepage": "http://jmsyst.com/bundles/JMSI18nRoutingBundle",       
     "type":         "symfony-bundle",
@@ -16,14 +16,13 @@
         }
     ],
     "require": {
-	"php": ">=5.3.9",
-        "symfony/framework-bundle": "~2.3|~3.0"
+	"php": "^7.1",
+        "symfony/framework-bundle": "^4.0"
     },
     "require-dev": {
-        "jms/di-extra-bundle": "~1.1",
         "sensio/framework-extra-bundle": "*",
-        "symfony/symfony": "~2.3|~3.0",
-        "phpunit/phpunit": "~4"
+        "symfony/symfony": "^4.0",
+        "phpunit/phpunit": "^6.0"
     },
     "suggest": {
         "jms/translation-bundle": "If you want to use the RouteTranslation extractor"

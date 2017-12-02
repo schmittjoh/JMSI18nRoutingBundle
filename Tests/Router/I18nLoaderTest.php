@@ -22,16 +22,14 @@ use JMS\I18nRoutingBundle\Router\DefaultPatternGenerationStrategy;
 
 use JMS\I18nRoutingBundle\Router\DefaultRouteExclusionStrategy;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
-use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\IdentityTranslator;
 use JMS\I18nRoutingBundle\Router\I18nLoader;
-use JMS\I18nRoutingBundle\Router\I18nRouter;
 
-class I18nLoaderTest extends \PHPUnit_Framework_TestCase
+class I18nLoaderTest extends TestCase
 {
     public function testLoad()
     {
@@ -145,7 +143,7 @@ class I18nLoaderTest extends \PHPUnit_Framework_TestCase
 
     private function getLoader($strategy = 'custom')
     {
-        $translator = new Translator('en', new MessageSelector());
+        $translator = new Translator('en');
         $translator->addLoader('yml', new YamlFileLoader());
         $translator->addResource('yml', __DIR__.'/Fixture/routes.de.yml', 'de', 'routes');
         $translator->addResource('yml', __DIR__.'/Fixture/routes.en.yml', 'en', 'routes');
