@@ -59,7 +59,7 @@
         </service>
         <service id="jms_i18n_routing.pattern_generation_strategy" alias="jms_i18n_routing.pattern_generation_strategy.default" public="false" />
         
-        <service id="jms_i18n_routing.loader" class="%jms_i18n_routing.loader.class%">
+        <service id="jms_i18n_routing.loader" class="%jms_i18n_routing.loader.class%" public="true">
             <argument type="service" id="jms_i18n_routing.route_exclusion_strategy" />
             <argument type="service" id="jms_i18n_routing.pattern_generation_strategy" />
         </service>
