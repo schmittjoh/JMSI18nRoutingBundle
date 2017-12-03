@@ -18,7 +18,6 @@
 
 namespace JMS\I18nRoutingBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -33,8 +32,7 @@ class JMSI18nRoutingExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container)
     {
-        $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration, $configs);
+        $config = $this->processConfiguration(new Configuration, $configs);
 
         $loader = new XmlFileLoader($container, new FileLocator(array(__DIR__.'/../Resources/config')));
         $loader->load('services.xml');
