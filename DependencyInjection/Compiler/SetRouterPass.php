@@ -30,7 +30,8 @@ class SetRouterPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $container->setAlias('router', 'jms_i18n_routing.router')->setPublic(true);
+        $container->setAlias('router', 'jms_i18n_routing.router');
+        $container->getAlias('router')->setPublic(true);
 
         $translatorDef = $container->findDefinition('translator');
         if ('%translator.identity.class%' === $translatorDef->getClass()) {
