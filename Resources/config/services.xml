@@ -7,14 +7,14 @@
     <parameters>
         <parameter key="jms_i18n_routing.router.class">JMS\I18nRoutingBundle\Router\I18nRouter</parameter>
         <parameter key="jms_i18n_routing.locale_resolver.class">JMS\I18nRoutingBundle\Router\DefaultLocaleResolver</parameter>
-        
+
         <parameter key="jms_i18n_routing.loader.class">JMS\I18nRoutingBundle\Router\I18nLoader</parameter>
         <parameter key="jms_i18n_routing.route_exclusion_strategy.class">JMS\I18nRoutingBundle\Router\DefaultRouteExclusionStrategy</parameter>
         <parameter key="jms_i18n_routing.pattern_generation_strategy.class">JMS\I18nRoutingBundle\Router\DefaultPatternGenerationStrategy</parameter>
-        
+
         <parameter key="jms_i18n_routing.locale_choosing_listener.class">JMS\I18nRoutingBundle\EventListener\LocaleChoosingListener</parameter>
         <parameter key="jms_i18n_routing.cookie_setting_listener.class">JMS\I18nRoutingBundle\EventListener\CookieSettingListener</parameter>
-        
+
         <parameter key="jms_i18n_routing.route_translation_extractor.class">JMS\I18nRoutingBundle\Translation\RouteTranslationExtractor</parameter>
     </parameters>
 
@@ -23,8 +23,12 @@
             <argument>%jms_i18n_routing.cookie.name%</argument>
         </service>
         <service id="jms_i18n_routing.locale_resolver" alias="jms_i18n_routing.locale_resolver.default" public="false" />
-        
+
         <service id="jms_i18n_routing.router" class="%jms_i18n_routing.router.class%" parent="router.default" public="false">
+            <tag name="monolog.logger" channel="router" />
+            <tag name="container.service_subscriber" id="routing.loader" />
+            <tag name="container.service_subscriber" id="request_stack" />
+            <tag name="container.service_subscriber" id="service_container" />
             <call method="setLocaleResolver">
                 <argument type="service" id="jms_i18n_routing.locale_resolver" />
             </call>
@@ -38,17 +42,17 @@
                 <argument>%jms_i18n_routing.redirect_to_host%</argument>
             </call>
         </service>
-        
+
         <service id="jms_i18n_routing.locale_choosing_listener" class="%jms_i18n_routing.locale_choosing_listener.class%" public="false">
             <argument>%jms_i18n_routing.default_locale%</argument>
             <argument>%jms_i18n_routing.locales%</argument>
             <argument type="service" id="jms_i18n_routing.locale_resolver" />
         </service>
-        
+
         <service id="jms_i18n_routing.cookie_setting_listener" class="%jms_i18n_routing.cookie_setting_listener.class%" public="false" />
-        
+
         <service id="jms_i18n_routing.route_exclusion_strategy" class="%jms_i18n_routing.route_exclusion_strategy.class%" public="false" />
-        
+
         <service id="jms_i18n_routing.pattern_generation_strategy.default" class="%jms_i18n_routing.pattern_generation_strategy.class%" public="false">
             <argument>%jms_i18n_routing.strategy%</argument>
             <argument type="service" id="translator" />
@@ -58,12 +62,12 @@
             <argument>%jms_i18n_routing.default_locale%</argument>
         </service>
         <service id="jms_i18n_routing.pattern_generation_strategy" alias="jms_i18n_routing.pattern_generation_strategy.default" public="false" />
-        
+
         <service id="jms_i18n_routing.loader" class="%jms_i18n_routing.loader.class%" public="true">
             <argument type="service" id="jms_i18n_routing.route_exclusion_strategy" />
             <argument type="service" id="jms_i18n_routing.pattern_generation_strategy" />
         </service>
-        
+
         <service id="jms_i18n_routing.route_translation_extractor" class="%jms_i18n_routing.route_translation_extractor.class%" public="false">
             <argument type="service" id="router" />
             <argument type="service" id="jms_i18n_routing.route_exclusion_strategy" />
