@@ -20,9 +20,11 @@ namespace JMS\I18nRoutingBundle\Router;
 
 use JMS\I18nRoutingBundle\Exception\NotAcceptableLanguageException;
 
-use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -38,24 +40,24 @@ class I18nRouter extends Router
     private $hostMap = array();
     private $i18nLoaderId;
     private $container;
+    private $paramFetcher;
     private $defaultLocale;
     private $redirectToHost = true;
     private $localeResolver;
 
-    /**
-     * Constructor.
-     *
-     * The only purpose of this is to make the container available in the sub-class
-     * since it is declared private in the parent class.
-     *
-     * The parameters are not listed explicitly here because they are different for
-     * Symfony 2.0 and 2.1. If we did list them, it would make this class incompatible
-     * with one of both versions.
-     */
-    public function __construct()
+    public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null, ContainerInterface $parameters = null, LoggerInterface $logger = null)
     {
-        call_user_func_array(array('Symfony\Bundle\FrameworkBundle\Routing\Router', '__construct'), func_get_args());
-        $this->container = func_get_arg(0);
+        $this->container = $container;
+
+        if ($parameters) {
+            $this->paramFetcher = array($parameters, 'get');
+        } elseif ($container instanceof SymfonyContainerInterface) {
+            $this->paramFetcher = array($container, 'getParameter');
+        } else {
+            throw new \LogicException(sprintf('You should either pass a "%s" instance or provide the $parameters argument of the "%s" method.', SymfonyContainerInterface::class, __METHOD__));
+        }
+
+        parent::__construct($container, $resource, $options, $context, $parameters, $logger);
     }
 
     public function setLocaleResolver(LocaleResolverInterface $resolver)
@@ -156,7 +158,7 @@ class I18nRouter extends Router
     {
         $collection = parent::getRouteCollection();
 
-        return $this->container->get($this->i18nLoaderId)->load($collection);
+        return $this->container->get('service_container')->get($this->i18nLoaderId)->load($collection);
     }
 
     public function getOriginalRouteCollection()
@@ -164,19 +166,9 @@ class I18nRouter extends Router
         return parent::getRouteCollection();
     }
 
-    /**
-     * To make compatible with Symfony <2.4
-     */
     public function matchRequest(Request $request)
     {
-        $matcher = $this->getMatcher();
-        $pathInfo = $request->getPathInfo();
-        if (!$matcher instanceof RequestMatcherInterface) {
-            // fallback to the default UrlMatcherInterface
-            return $this->matchI18n($matcher->match($pathInfo), $pathInfo);
-        }
-
-        return $this->matchI18n($matcher->matchRequest($request), $pathInfo);
+        return $this->matchI18n(parent::matchRequest($request), $request->getPathInfo());
     }
 
     private function matchI18n(array $params, $url)
@@ -185,7 +177,7 @@ class I18nRouter extends Router
             return false;
         }
 
-        $request = $this->getRequest();
+        $request = $this->container->has('request_stack') ? $this->container->get('request_stack')->getCurrentRequest() : null;
 
         if (isset($params['_locales'])) {
             if (false !== $pos = strpos($params['_route'], I18nLoader::ROUTING_PREFIX)) {
@@ -269,25 +261,18 @@ class I18nRouter extends Router
                 && null !== $request
                 && $locale = $this->localeResolver->resolveLocale(
                         $request,
-                        $this->container->getParameter('jms_i18n_routing.locales'))) {
+                        ($this->paramFetcher)('jms_i18n_routing.locales'))) {
             $params['_locale'] = $locale;
         }
 
         return $params;
     }
 
-    /**
-     * @return Request|null
-     */
-    private function getRequest()
+    public static function getSubscribedServices()
     {
-        $request = null;
-        if ($this->container->has('request_stack')) {
-            $request = $this->container->get('request_stack')->getCurrentRequest();
-        } elseif (method_exists($this->container, 'isScopeActive') && $this->container->isScopeActive('request')) {
-            $request = $this->container->get('request');
-        }
-
-        return $request;
+        return \array_merge(parent::getSubscribedServices(), [
+            'request_stack' => '?'.RequestStack::class,
+            'service_container' => ContainerInterface::class,
+        ]);
     }
 }
