@@ -49,7 +49,9 @@ class DefaultLocaleResolver implements LocaleResolverInterface
         // check if a session exists, and if it contains a locale
         if ($request->hasPreviousSession()) {
             $session = $request->getSession();
-            if ($session->has('_locale')) {
+
+            // Do not use session if not already started
+            if ($session->isStarted() && $session->has('_locale')) {
                 return $session->get('_locale');
             }
         }

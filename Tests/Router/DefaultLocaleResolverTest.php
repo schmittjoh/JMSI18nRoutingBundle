@@ -27,26 +27,25 @@ class DefaultLocaleResolverTest extends \PHPUnit_Framework_TestCase
         $tests[] = array(Request::create('/?hl=de'), array('foo'), 'de', 'Query parameter is selected');
         $tests[] = array(Request::create('/?hl=de', 'GET', array(), array('hl' => 'en')), array('foo'), 'de', 'Query parameter has precedence before cookie');
 
-        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
-        $session->expects($this->any())
-            ->method('has')
-            ->with('_locale')
-            ->will($this->returnValue(true));
-        $session->expects($this->any())
-            ->method('get')
-            ->with('_locale')
-            ->will($this->returnValue('fr'));
-        $session->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('SESS'));
-
         $tests[] = array($request = Request::create('/?hl=de', 'GET', array(), array('SESS' => 'foo')), array('foo'), 'de', 'Query parameter has precedence before session');
+        $session = $this->createSession();
         $request->setSession($session);
 
         $tests[] = array($request = Request::create('/', 'GET', array(), array('SESS' => 'foo')), array('foo'), 'fr', 'Session is used');
+        $session = $this->createSession();
+        $request->setSession($session);
+
+        $tests[] = array($request = Request::create('/', 'GET', array(), array('SESS' => 'foo')), array('foo'), null, 'No session');
+
+        $tests[] = array($request = Request::create('/', 'GET', array(), array('SESS' => 'foo')), array('foo'), 'fr', 'Session is not started');
+        $session = $this->createSession();
+        $session->expects($this->any())
+            ->method('isStarted')
+            ->will($this->returnValue(false));
         $request->setSession($session);
 
         $tests[] = array($request = Request::create('/', 'GET', array(), array('hl' => 'es', 'SESS' => 'foo')), array('foo'), 'fr', 'Session has precedence before cookie.');
+        $session = $this->createSession();
         $request->setSession($session);
 
         $tests[] = array(Request::create('/', 'GET', array(), array('hl' => 'es')), array('foo'), 'es', 'Cookie is used');
@@ -64,5 +63,26 @@ class DefaultLocaleResolverTest extends \PHPUnit_Framework_TestCase
             'foo' => 'en',
             'bar' => 'de',
         ));
+    }
+
+    private function createSession()
+    {
+        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
+        $session->expects($this->any())
+            ->method('has')
+            ->with('_locale')
+            ->will($this->returnValue(true));
+        $session->expects($this->any())
+            ->method('get')
+            ->with('_locale')
+            ->will($this->returnValue('fr'));
+        $session->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('SESS'));
+        $session->expects($this->any())
+            ->method('isStarted')
+            ->will($this->returnValue(true));
+
+        return $session;
     }
 }
