@@ -23,7 +23,7 @@ class CookieSettingListener
     private $cookieSecure;
     private $cookieHttponly;
 
-    public function __construct($cookieName, $cookieLifetime, $cookiePath, $cookieDomain, $cookieSecure, $cookieHttponly)
+    public function __construct($cookieName, $cookieLifetime, $cookiePath, $cookieDomain, $cookieSecure, $cookieHttponly, $strategy)
     {
         $this->cookieName = $cookieName;
         $this->cookieLifetime = $cookieLifetime;
@@ -31,6 +31,7 @@ class CookieSettingListener
         $this->cookieDomain = $cookieDomain;
         $this->cookieSecure = $cookieSecure;
         $this->cookieHttponly = $cookieHttponly;
+        $this->strategy = $strategy;
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
@@ -42,9 +43,11 @@ class CookieSettingListener
 
         $request = $event->getRequest();
 
-        if (!$request->cookies->has($this->cookieName)
-                || $request->cookies->get($this->cookieName) !== $request->getLocale()) {
-            $event->getResponse()->headers->setCookie(new Cookie($this->cookieName, $request->getLocale(), time() + $this->cookieLifetime, $this->cookiePath, $this->cookieDomain, $this->cookieSecure, $this->cookieHttponly));
+        if ($this->strategy == 'custom') {
+            if (!$request->cookies->has($this->cookieName)
+                    || $request->cookies->get($this->cookieName) !== $request->getLocale()) {
+                $event->getResponse()->headers->setCookie(new Cookie($this->cookieName, $request->getLocale(), time() + $this->cookieLifetime, $this->cookiePath, $this->cookieDomain, $this->cookieSecure, $this->cookieHttponly));
+            }
         }
     }
 }
