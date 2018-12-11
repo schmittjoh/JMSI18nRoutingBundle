@@ -31,7 +31,8 @@ use Symfony\Component\Config\Loader\LoaderResolver;
  */
 class I18nLoader
 {
-    const ROUTING_PREFIX = '__RG__';
+    const ROUTING_PREFIX_GRP = '';
+    const ROUTING_PREFIX = '_';
 
     private $routeExclusionStrategy;
     private $patternGenerationStrategy;
@@ -63,12 +64,12 @@ class I18nLoader
                     $catchMultipleRoute = clone $route;
                     $catchMultipleRoute->setPath($pattern);
                     $catchMultipleRoute->setDefault('_locales', $locales);
-                    $i18nCollection->add(implode('_', $locales).I18nLoader::ROUTING_PREFIX.$name, $catchMultipleRoute);
+                    $i18nCollection->add(I18nLoader::ROUTING_PREFIX_GRP.$name, $catchMultipleRoute);
                 }
 
                 foreach ($locales as $locale) {
                     $localeRoute = clone $route;
-                    $localeRoute->setPath($pattern);
+                    $localeRoute->setPath($locale.$pattern);
                     $localeRoute->setDefault('_locale', $locale);
                     $i18nCollection->add($locale.I18nLoader::ROUTING_PREFIX.$name, $localeRoute);
                 }
