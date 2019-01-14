@@ -26,11 +26,16 @@ final class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
     {
-        $tb = new TreeBuilder();
+        $tb = new TreeBuilder('jms_i18n_routing');
 
-        $tb
-            ->root('jms_i18n_routing')
-                ->fixXmlConfig('host')
+        if (method_exists($tb, 'getRootNode')) {
+            $root = $tb->getRootNode()->children();
+        } else {
+            $root = $tb->root('jms_i18n_routing')->children();
+        }
+
+        $root
+            ->fixXmlConfig('host')
                 ->validate()
                     ->always()
                     ->then(function($v) {
