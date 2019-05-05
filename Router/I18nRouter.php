@@ -38,7 +38,7 @@ class I18nRouter extends Router
     private $hostMap = array();
     private $i18nLoaderId;
     private $container;
-    private $defaultLocale;
+    protected $defaultLocale;
     private $redirectToHost = true;
     private $localeResolver;
 
