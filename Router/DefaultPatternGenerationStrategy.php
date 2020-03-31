@@ -4,7 +4,7 @@ namespace JMS\I18nRoutingBundle\Router;
 
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Translation\LoggingTranslator;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Component\Routing\Route;
 
