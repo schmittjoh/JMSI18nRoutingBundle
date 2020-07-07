@@ -4,7 +4,7 @@ namespace JMS\I18nRoutingBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
  * Sets the user's language as a cookie.
@@ -33,7 +33,7 @@ class CookieSettingListener
         $this->cookieHttponly = $cookieHttponly;
     }
 
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event)
     {
         //Check if the current response contains an error. If it does, do not set the cookie as the Locale may not be properly set
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType() || !($event->getResponse()->isSuccessful() || $event->getResponse()->isRedirection())) {
