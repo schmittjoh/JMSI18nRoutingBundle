@@ -72,6 +72,7 @@ class JMSI18nRoutingExtension extends Extension
                 ->addArgument($config['cookie']['domain'])
                 ->addArgument($config['cookie']['secure'])
                 ->addArgument($config['cookie']['httponly'])
+                ->addArgument($config['strategy'])
                 ->setPublic(true)
                 ->addTag('kernel.event_listener', array('event' => 'kernel.response', 'priority' => 256))
             ;
