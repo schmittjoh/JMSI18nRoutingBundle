@@ -48,7 +48,7 @@ class JMSI18nRoutingExtension extends Extension
             $container
                 ->getDefinition('jms_i18n_routing.locale_choosing_listener')
                 ->setPublic(true)
-                ->addTag('kernel.event_listener', array('event' => 'kernel.exception', 'priority' => 128))
+                ->addTag('kernel.event_listener', array('event' => 'kernel.request', 'priority' => 128))
             ;
         }
 
