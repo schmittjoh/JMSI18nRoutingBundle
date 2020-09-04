@@ -21,6 +21,7 @@
     <services>
         <service id="jms_i18n_routing.locale_resolver.default" class="%jms_i18n_routing.locale_resolver.class%" public="false">
             <argument>%jms_i18n_routing.cookie.name%</argument>
+            <argument>%jms_i18n_routing.accept_header_languages%</argument>
         </service>
         <service id="jms_i18n_routing.locale_resolver" alias="jms_i18n_routing.locale_resolver.default" public="false" />
         
