@@ -21,7 +21,7 @@
     },
     "require-dev": {
         "sensio/framework-extra-bundle": "*",
-        "symfony/symfony": "^4.0 || ^5.0",
+        "symfony/symfony": "^4.3 || ^5.0",
         "phpunit/phpunit": "^6.0"
     },
     "suggest": {
