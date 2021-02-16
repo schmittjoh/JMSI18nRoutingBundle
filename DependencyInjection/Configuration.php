@@ -28,12 +28,7 @@ final class Configuration implements ConfigurationInterface
     {
         $tb = new TreeBuilder('jms_i18n_routing');
 
-        if (method_exists($tb, 'getRootNode')) {
-            $root = $tb->getRootNode();
-        } else {
-            $root = $tb->root('jms_i18n_routing');
-        }
-
+        $root = $tb->getRootNode();
         $root
             ->fixXmlConfig('host')
                 ->validate()
