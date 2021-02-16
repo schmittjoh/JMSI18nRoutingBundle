@@ -20,7 +20,7 @@ namespace JMS\I18nRoutingBundle\EventListener;
 
 use JMS\I18nRoutingBundle\Router\LocaleResolverInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -48,7 +48,7 @@ class LocaleChoosingListener
         $this->localeResolver = $localeResolver;
     }
 
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(ExceptionEvent $event)
     {
         if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
             return;
@@ -59,7 +59,7 @@ class LocaleChoosingListener
             return;
         }
 
-        $ex = $event->getException();
+        $ex = $event->getThrowable();
         if (!$ex instanceof NotFoundHttpException || !$ex->getPrevious() instanceof ResourceNotFoundException) {
             return;
         }

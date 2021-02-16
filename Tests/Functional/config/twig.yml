@@ -1,7 +1,5 @@
-framework:
-    templating:
-        engines: [twig, php]
-
 twig:
     debug: "%kernel.debug%"
     strict_variables: "%kernel.debug%"
+    paths:
+        '%kernel.project_dir%/Resources/views/': Test

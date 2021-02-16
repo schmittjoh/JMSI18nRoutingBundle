@@ -18,6 +18,7 @@
 
 namespace JMS\I18nRoutingBundle\Tests\Router;
 
+use JMS\I18nRoutingBundle\Exception\NotAcceptableLanguageException;
 use JMS\I18nRoutingBundle\Router\DefaultPatternGenerationStrategy;
 use JMS\I18nRoutingBundle\Router\DefaultRouteExclusionStrategy;
 use PHPUnit\Framework\TestCase;
@@ -41,19 +42,19 @@ class I18nRouterTest extends TestCase
     public function testGenerate()
     {
         $router = $this->getRouter();
-        $this->assertEquals('/welcome-on-our-website', $router->generate('welcome'));
+        self::assertEquals('/welcome-on-our-website', $router->generate('welcome'));
 
         $context = new RequestContext();
         $context->setParameter('_locale', 'en');
         $router->setContext($context);
 
-        $this->assertEquals('/welcome-on-our-website', $router->generate('welcome'));
-        $this->assertEquals('/willkommen-auf-unserer-webseite', $router->generate('welcome', array('_locale' => 'de')));
-        $this->assertEquals('/welcome-on-our-website', $router->generate('welcome', array('_locale' => 'fr')));
+        self::assertEquals('/welcome-on-our-website', $router->generate('welcome'));
+        self::assertEquals('/willkommen-auf-unserer-webseite', $router->generate('welcome', array('_locale' => 'de')));
+        self::assertEquals('/welcome-on-our-website', $router->generate('welcome', array('_locale' => 'fr')));
 
         // test homepage
-        $this->assertEquals('/', $router->generate('homepage', array('_locale' => 'en')));
-        $this->assertEquals('/', $router->generate('homepage', array('_locale' => 'de')));
+        self::assertEquals('/', $router->generate('homepage', array('_locale' => 'en')));
+        self::assertEquals('/', $router->generate('homepage', array('_locale' => 'de')));
     }
 
     public function testGenerateWithHostMap()
@@ -65,17 +66,17 @@ class I18nRouterTest extends TestCase
             'fr' => 'fr.host',
         ));
 
-        $this->assertEquals('/welcome-on-our-website', $router->generate('welcome'));
-        $this->assertEquals('http://en.host/welcome-on-our-website', $router->generate('welcome', array(), UrlGeneratorInterface::ABSOLUTE_URL));
+        self::assertEquals('/welcome-on-our-website', $router->generate('welcome'));
+        self::assertEquals('http://en.host/welcome-on-our-website', $router->generate('welcome', array(), UrlGeneratorInterface::ABSOLUTE_URL));
 
         $context = new RequestContext();
         $context->setParameter('_locale', 'en');
         $router->setContext($context);
 
-        $this->assertEquals('/welcome-on-our-website', $router->generate('welcome'));
-        $this->assertEquals('http://en.host/welcome-on-our-website', $router->generate('welcome', array(), UrlGeneratorInterface::ABSOLUTE_URL));
-        $this->assertEquals('http://de.host/willkommen-auf-unserer-webseite', $router->generate('welcome', array('_locale' => 'de')));
-        $this->assertEquals('http://de.host/willkommen-auf-unserer-webseite', $router->generate('welcome', array('_locale' => 'de'), UrlGeneratorInterface::ABSOLUTE_URL));
+        self::assertEquals('/welcome-on-our-website', $router->generate('welcome'));
+        self::assertEquals('http://en.host/welcome-on-our-website', $router->generate('welcome', array(), UrlGeneratorInterface::ABSOLUTE_URL));
+        self::assertEquals('http://de.host/willkommen-auf-unserer-webseite', $router->generate('welcome', array('_locale' => 'de')));
+        self::assertEquals('http://de.host/willkommen-auf-unserer-webseite', $router->generate('welcome', array('_locale' => 'de'), UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
     public function testGenerateDoesUseCorrectHostWhenSchemeChanges()
@@ -93,21 +94,21 @@ class I18nRouterTest extends TestCase
         $context->setParameter('_locale', 'en');
         $router->setContext($context);
 
-        $this->assertEquals('https://en.test/login', $router->generate('login'));
-        $this->assertEquals('https://de.test/einloggen', $router->generate('login', array('_locale' => 'de')));
+        self::assertEquals('https://en.test/login', $router->generate('login'));
+        self::assertEquals('https://de.test/einloggen', $router->generate('login', array('_locale' => 'de')));
     }
 
     public function testGenerateDoesNotI18nInternalRoutes()
     {
         $router = $this->getRouter();
 
-        $this->assertEquals('/internal?_locale=de', $router->generate('_internal', array('_locale' => 'de')));
+        self::assertEquals('/internal?_locale=de', $router->generate('_internal', array('_locale' => 'de')));
     }
 
     public function testGenerateWithNonI18nRoute()
     {
-        $router = $this->getRouter('routing.yml', new IdentityTranslator(new MessageSelector()));
-        $this->assertEquals('/this-is-used-for-checking-login', $router->generate('login_check'));
+        $router = $this->getRouter('routing.yml', new IdentityTranslator());
+        self::assertEquals('/this-is-used-for-checking-login', $router->generate('login_check'));
     }
 
     public function testMatch()
@@ -123,9 +124,9 @@ class I18nRouterTest extends TestCase
         $context->setParameter('_locale', 'en');
         $router->setContext($context);
 
-        $this->assertEquals(array('_controller' => 'foo', '_locale' => 'en', '_route' => 'welcome'), $router->match('/welcome-on-our-website'));
+        self::assertEquals(array('_controller' => 'foo', '_locale' => 'en', '_route' => 'welcome'), $router->match('/welcome-on-our-website'));
 
-        $this->assertEquals(array(
+        self::assertEquals(array(
             '_controller' => 'JMS\I18nRoutingBundle\Controller\RedirectController::redirectAction',
             'path'        => '/willkommen-auf-unserer-webseite',
             'host'        => 'de.test',
@@ -146,19 +147,19 @@ class I18nRouterTest extends TestCase
         $router->setContext($context);
 
         // The route should be available for both en_UK and en_US
-        $this->assertEquals(array('_route' => 'news_overview', '_locale' => 'en_US'), $router->match('/news'));
+        self::assertEquals(array('_route' => 'news_overview', '_locale' => 'en_US'), $router->match('/news'));
 
         $context->setParameter('_locale', 'en_UK');
         $context->setHost('uk.test');
         $router->setContext($context);
 
         // The route should be available for both en_UK and en_US
-        $this->assertEquals(array('_route' => 'news_overview', '_locale' => 'en_UK'), $router->match('/news'));
+        self::assertEquals(array('_route' => 'news_overview', '_locale' => 'en_UK'), $router->match('/news'));
 
         // Tests whether generating a route to a different locale works
-        $this->assertEquals('http://nl.test/nieuws', $router->generate('news_overview', array('_locale' => 'nl_NL')));
+        self::assertEquals('http://nl.test/nieuws', $router->generate('news_overview', array('_locale' => 'nl_NL')));
 
-        $this->assertEquals(array('_route' => 'english_only', '_locale' => 'en_UK'), $router->match('/english-only'));
+        self::assertEquals(array('_route' => 'english_only', '_locale' => 'en_UK'), $router->match('/english-only'));
     }
 
     /**
@@ -174,20 +175,21 @@ class I18nRouterTest extends TestCase
         $router->setContext($context);
 
         // Test overwrite
-        $this->assertEquals(array('_route' => 'sub_locale', '_locale' => 'en_US'), $router->match('/american'));
+        self::assertEquals(array('_route' => 'sub_locale', '_locale' => 'en_US'), $router->match('/american'));
 
         $context->setParameter('_locale', 'en_UK');
         $context->setHost('uk.test');
         $router->setContext($context);
-        $this->assertEquals(array('_route' => 'enUK_only', '_locale' => 'en_UK'), $router->match('/enUK-only'));
+        self::assertEquals(array('_route' => 'enUK_only', '_locale' => 'en_UK'), $router->match('/enUK-only'));
     }
 
     /**
      * @dataProvider getMatchThrowsExceptionFixtures
-     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
      */
     public function testMatchThrowsException($locale, $host, $pattern)
     {
+        $this->expectException(ResourceNotFoundException::class);
+
         $router = $this->getNonRedirectingHostMapRouter();
         $context = new RequestContext();
         $context->setParameter('_locale', $locale);
@@ -209,10 +211,11 @@ class I18nRouterTest extends TestCase
 
     /**
      * @dataProvider getGenerateThrowsExceptionFixtures
-     * @expectedException Symfony\Component\Routing\Exception\RouteNotFoundException
      */
     public function testGenerateThrowsException($locale, $host, $route)
     {
+        $this->expectException(RouteNotFoundException::class);
+
         $router = $this->getNonRedirectingHostMapRouter();
         $context = new RequestContext();
         $context->setParameter('_locale', $locale);
@@ -230,12 +233,11 @@ class I18nRouterTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
-     * @expectedExceptionMessage The route "sub_locale" is not available on the current host "us.test", but only on these hosts "uk.test, nl.test, be.test".
-     */
     public function testMatchThrowsResourceNotFoundWhenRouteIsUsedByMultipleLocalesOnDifferentHost()
     {
+        $this->expectException(ResourceNotFoundException::class);
+        $this->expectExceptionMessage('The route "sub_locale" is not available on the current host "us.test", but only on these hosts "uk.test, nl.test, be.test".');
+
         $router = $this->getNonRedirectingHostMapRouter();
 
         $context = $router->getContext();
@@ -244,12 +246,11 @@ class I18nRouterTest extends TestCase
         $router->match('/english');
     }
 
-    /**
-     * @expectedException JMS\I18nRoutingBundle\Exception\NotAcceptableLanguageException
-     * @expectedExceptionMessage The requested language "en_US" was not available. Available languages: "en_UK, nl_NL, nl_BE"
-     */
     public function testMatchThrowsNotAcceptableLanguageWhenRouteIsUsedByMultipleOtherLocalesOnSameHost()
     {
+        $this->expectException(NotAcceptableLanguageException::class);
+        $this->expectExceptionMessage('The requested language "en_US" was not available. Available languages: "en_UK, nl_NL, nl_BE"');
+
         $router = $this->getNonRedirectingHostMapRouter();
         $router->setHostMap(array(
             'en_US' => 'foo.com',
@@ -287,7 +288,7 @@ class I18nRouterTest extends TestCase
             ->will($this->returnValue('de'));
 
         $params = $router->match('/');
-        $this->assertSame('de', $params['_locale']);
+        self::assertSame('de', $params['_locale']);
     }
 
     private function getRouter($config = 'routing.yml', $translator = null, $localeResolver = null)

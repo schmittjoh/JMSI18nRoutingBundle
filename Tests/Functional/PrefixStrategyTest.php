@@ -20,18 +20,21 @@ namespace JMS\I18nRoutingBundle\Tests\Functional;
 
 class PrefixStrategyTest extends BaseTestCase
 {
+    protected static $class = PrefixStrategyKernel::class;
+
     /**
      * @dataProvider getLocaleChoosingTests
      */
     public function testLocaleIsChoosenWhenHomepageIsRequested($acceptLanguages, $expectedLocale)
     {
-        $client = $this->createClient(array('config' => 'strategy_prefix.yml'), array(
+        $client = self::createClient(array(), array(
             'HTTP_ACCEPT_LANGUAGE' => $acceptLanguages,
         ));
         $client->insulate();
 
         $client->request('GET', '/?extra=params');
-        $this->assertTrue($client->getResponse()->isRedirect('/'.$expectedLocale.'/?extra=params'), (string) $client->getResponse());
+
+        self::assertTrue($client->getResponse()->isRedirect('/'.$expectedLocale.'/?extra=params'), (string) $client->getResponse());
     }
 
     public function getLocaleChoosingTests()
@@ -45,30 +48,30 @@ class PrefixStrategyTest extends BaseTestCase
 
     public function testLanguageCookieIsSet()
     {
-        $client = $this->createClient(array('config' => 'strategy_prefix.yml'));
+        $client = self::createClient(array());
         $client->insulate();
 
         $client->request('GET', '/?hl=de');
 
         $response = $client->getResponse();
-        $this->assertTrue($response->isRedirect('/de/'), (string) $response);
+        self::assertTrue($response->isRedirect('/de/'), (string) $response);
 
         $cookies = $response->headers->getCookies();
-        $this->assertSame(1, count($cookies));
-        $this->assertSame('de', $cookies[0]->getValue());
+        self::assertSame(1, count($cookies));
+        self::assertSame('de', $cookies[0]->getValue());
     }
 
     public function testNoCookieOnError()
     {
-        $client = $this->createClient(array('config' => 'strategy_prefix.yml'));
+        $client = self::createClient(array());
         $client->insulate();
 
         $client->request('GET', '/nonexistent');
 
         $response = $client->getResponse();
-        $this->assertTrue($response->isClientError(), (string) $response);
+        self::assertTrue($response->isClientError(), (string) $response);
 
         $cookies = $response->headers->getCookies();
-        $this->assertSame(0, count($cookies));
+        self::assertSame(0, count($cookies));
     }
 }

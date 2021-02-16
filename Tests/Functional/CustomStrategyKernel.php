@@ -18,16 +18,12 @@
 
 namespace JMS\I18nRoutingBundle\Tests\Functional;
 
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Config\Loader\LoaderInterface;
 
-class BaseTestCase extends WebTestCase
+class CustomStrategyKernel extends AbstractKernel
 {
-    protected function setUp(): void
+    function registerContainerConfiguration(LoaderInterface $loader)
     {
-        parent::setUp();
-
-        $fs = new Filesystem();
-        $fs->remove(sys_get_temp_dir().'/JMSI18nRoutingBundle');
+        $loader->load(__DIR__.'/config/strategy_custom_with_hosts.yml');
     }
 }

@@ -37,15 +37,15 @@ class I18nLoaderTest extends TestCase
         $col->add('contact', new Route('/contact'));
         $i18nCol = $this->getLoader()->load($col);
 
-        $this->assertEquals(2, count($i18nCol->all()));
+        self::assertEquals(2, count($i18nCol->all()));
 
         $de = $i18nCol->get('de__RG__contact');
-        $this->assertEquals('/kontakt', $de->getPath());
-        $this->assertEquals('de', $de->getDefault('_locale'));
+        self::assertEquals('/kontakt', $de->getPath());
+        self::assertEquals('de', $de->getDefault('_locale'));
 
         $en = $i18nCol->get('en__RG__contact');
-        $this->assertEquals('/contact', $en->getPath());
-        $this->assertEquals('en', $en->getDefault('_locale'));
+        self::assertEquals('/contact', $en->getPath());
+        self::assertEquals('en', $en->getDefault('_locale'));
     }
 
     public function testLoadDoesNotRemoveOriginalIfNotAllRoutesHaveTranslationsUnlessRedirectIsOff()
@@ -54,13 +54,13 @@ class I18nLoaderTest extends TestCase
         $col->add('support', new Route('/support'));
         $i18nCol = $this->getLoader('custom')->load($col);
 
-        $this->assertEquals(3, count($i18nCol->all()));
+        self::assertEquals(3, count($i18nCol->all()));
 
         $de = $i18nCol->get('de__RG__support');
-        $this->assertEquals('/support', $de->getPath());
+        self::assertEquals('/support', $de->getPath());
 
         $en = $i18nCol->get('en__RG__support');
-        $this->assertEquals('/support', $en->getPath());
+        self::assertEquals('/support', $en->getPath());
     }
 
     /**
@@ -72,8 +72,8 @@ class I18nLoaderTest extends TestCase
         $col->add('route', new Route('/no-i18n', array(), array(), array('i18n' => false)));
         $i18nCol = $this->getLoader($strategy)->load($col);
 
-        $this->assertEquals(1, count($i18nCol->all()));
-        $this->assertNull($i18nCol->get('route')->getDefault('_locale'));
+        self::assertEquals(1, count($i18nCol->all()));
+        self::assertNull($i18nCol->get('route')->getDefault('_locale'));
     }
 
     public function testLoadUsesOriginalTranslationIfNoTranslationExists()
@@ -82,9 +82,9 @@ class I18nLoaderTest extends TestCase
         $col->add('untranslated_route', new Route('/not-translated'));
         $i18nCol = $this->getLoader()->load($col);
 
-        $this->assertEquals(3, count($i18nCol->all()));
-        $this->assertEquals('/not-translated', $i18nCol->get('de__RG__untranslated_route')->getPath());
-        $this->assertEquals('/not-translated', $i18nCol->get('en__RG__untranslated_route')->getPath());
+        self::assertEquals(3, count($i18nCol->all()));
+        self::assertEquals('/not-translated', $i18nCol->get('de__RG__untranslated_route')->getPath());
+        self::assertEquals('/not-translated', $i18nCol->get('en__RG__untranslated_route')->getPath());
     }
 
     public function testLoadIfRouteIsNotTranslatedToAllLocales()
@@ -93,7 +93,7 @@ class I18nLoaderTest extends TestCase
         $col->add('route', new Route('/not-available-everywhere', array(), array(), array('i18n_locales' => array('en'))));
         $i18nCol = $this->getLoader()->load($col);
 
-        $this->assertEquals(array('en__RG__route'), array_keys($i18nCol->all()));
+        self::assertEquals(array('en__RG__route'), array_keys($i18nCol->all()));
     }
 
     public function testLoadIfStrategyIsPrefix()
@@ -102,13 +102,13 @@ class I18nLoaderTest extends TestCase
         $col->add('contact', new Route('/contact'));
         $i18nCol = $this->getLoader('prefix')->load($col);
 
-        $this->assertEquals(2, count($i18nCol->all()));
+        self::assertEquals(2, count($i18nCol->all()));
 
         $de = $i18nCol->get('de__RG__contact');
-        $this->assertEquals('/de/kontakt', $de->getPath());
+        self::assertEquals('/de/kontakt', $de->getPath());
 
         $en = $i18nCol->get('en__RG__contact');
-        $this->assertEquals('/en/contact', $en->getPath());
+        self::assertEquals('/en/contact', $en->getPath());
     }
 
     public function testLoadIfStrategyIsPrefixExceptDefault()
@@ -117,13 +117,13 @@ class I18nLoaderTest extends TestCase
         $col->add('contact', new Route('/contact'));
         $i18nCol = $this->getLoader('prefix_except_default')->load($col);
 
-        $this->assertEquals(2, count($i18nCol->all()));
+        self::assertEquals(2, count($i18nCol->all()));
 
         $de = $i18nCol->get('de__RG__contact');
-        $this->assertEquals('/de/kontakt', $de->getPath());
+        self::assertEquals('/de/kontakt', $de->getPath());
 
         $en = $i18nCol->get('en__RG__contact');
-        $this->assertEquals('/contact', $en->getPath());
+        self::assertEquals('/contact', $en->getPath());
     }
 
     public function testLoadAddsPrefix()
@@ -133,7 +133,7 @@ class I18nLoaderTest extends TestCase
         $i18nCol = $this->getLoader('prefix')->load($col);
 
         $en = $i18nCol->get('en__RG__dashboard');
-        $this->assertEquals('/admin/en/dashboard', $en->getPath());
+        self::assertEquals('/admin/en/dashboard', $en->getPath());
     }
 
     public function getStrategies()
