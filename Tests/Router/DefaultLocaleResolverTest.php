@@ -16,7 +16,7 @@ class DefaultLocaleResolverTest extends TestCase
      */
     public function testResolveLocale(Request $request, array $locales, $expected, $message)
     {
-        $this->assertSame($expected, $this->resolver->resolveLocale($request, $locales), $message);
+        self::assertSame($expected, $this->resolver->resolveLocale($request, $locales), $message);
     }
 
     public function getResolutionTests()
@@ -58,7 +58,7 @@ class DefaultLocaleResolverTest extends TestCase
         return $tests;
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resolver = new DefaultLocaleResolver('hl', array(
             'foo' => 'en',

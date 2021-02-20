@@ -20,16 +20,18 @@ namespace JMS\I18nRoutingBundle\Tests\Functional;
 
 class CustomStrategyTest extends BaseTestCase
 {
+    protected static $class = CustomStrategyKernel::class;
+
     public function testDefaultLocaleIsSetCorrectly()
     {
-        $client = $this->createClient(array('config' => 'strategy_custom_with_hosts.yml'), array(
+        $client = self::createClient(array(), array(
             'HTTP_HOST' => 'de.host',
         ));
         $client->insulate();
 
         $crawler = $client->request('GET', '/');
 
-        $this->assertEquals(1, count($locale = $crawler->filter('#locale')), substr($client->getResponse(), 0, 2000));
-        $this->assertEquals('de', $locale->text());
+        self::assertEquals(1, count($locale = $crawler->filter('#locale')), substr($client->getResponse(), 0, 2000));
+        self::assertEquals('de', $locale->text());
     }
 }
