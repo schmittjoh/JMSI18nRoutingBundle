@@ -291,6 +291,17 @@ class I18nRouterTest extends TestCase
         self::assertSame('de', $params['_locale']);
     }
 
+    public function testMultipleLocale()
+    {
+        $router = $this->getNonRedirectingHostMapRouter();
+
+        $context = new RequestContext('/', 'GET', 'uk.test');
+        $context->setParameter('_locale', 'en');
+        $router->setContext($context);
+
+        $this->assertEquals(array('_locale' => 'en_UK', '_route' => 'multiple_locale'), $router->match('/multiple_locale'));
+    }
+
     private function getRouter($config = 'routing.yml', $translator = null, $localeResolver = null)
     {
         $container = new Container();
