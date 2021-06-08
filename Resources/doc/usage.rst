@@ -9,8 +9,13 @@ routes to make them translatable.
 
 Translating Routes
 ------------------
-Once your code is stable enough to begin translation, you can use the ``translation:extract``
-command that is provided by JMSTranslationBundle_:
+
+Routes are translated in translation domain ``routes``, so in Symfony 4 you can create ``translations/routes.<locale>.yaml``. The translation key is the name of your route, so if your routes is named ``news.detail``, the translation key is also ``news.detail``.
+
+Integrating With JMSTranslationBundle_
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can use the ``translation:extract`` command that is provided by JMSTranslationBundle_ to locate translations:
 
 .. code-block :: bash
 
