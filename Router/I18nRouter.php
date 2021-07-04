@@ -54,7 +54,7 @@ class I18nRouter extends Router
      */
     public function __construct()
     {
-        call_user_func_array(array('Symfony\Bundle\FrameworkBundle\Routing\Router', '__construct'), func_get_args());
+        parent::__construct(...func_get_args());
         $this->container = func_get_arg(0);
     }
 
