@@ -124,3 +124,6 @@ Resulting URLs::
 
 - /kontakt
 - /contact
+
+5. Important notes
+It is good to know that changing the strategy may behave strange if the cache is not cleared. So on changing the prefix strategy is good to perform ```php bin/console cache:clear``` in Symfony 2.8+ or ```php app/console cache:clear``` for Symfony < 2.8.
