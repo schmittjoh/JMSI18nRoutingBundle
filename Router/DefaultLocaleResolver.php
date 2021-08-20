@@ -22,10 +22,11 @@ class DefaultLocaleResolver implements LocaleResolverInterface
     private $cookieName;
     private $hostMap;
 
-    public function __construct($cookieName, array $hostMap = array())
+    public function __construct($cookieName, $acceptHeaderLanguages = true, array $hostMap = array())
     {
         $this->cookieName = $cookieName;
         $this->hostMap = $hostMap;
+        $this->acceptHeaderLanguages = $acceptHeaderLanguages;
     }
 
     /**
@@ -64,7 +65,7 @@ class DefaultLocaleResolver implements LocaleResolverInterface
         }
 
         // use accept header for locale matching if sent
-        if ($languages = $request->getLanguages()) {
+        if (true == $this->acceptHeaderLanguages && $languages = $request->getLanguages()) {
             foreach ($languages as $lang) {
                 if (in_array($lang, $availableLocales, true)) {
                     return $lang;
