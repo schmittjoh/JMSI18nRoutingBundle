@@ -27,6 +27,7 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * I18n Router implementation.
@@ -96,6 +97,8 @@ class I18nRouter extends Router
 
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
     public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
@@ -146,12 +149,17 @@ class I18nRouter extends Router
 
     /**
      * {@inheritdoc}
+     *
+     * @return array
      */
     public function match($url)
     {
         return $this->matchI18n(parent::match($url), $url);
     }
 
+    /**
+     * @return RouteCollection
+     */
     public function getRouteCollection()
     {
         $collection = parent::getRouteCollection();
@@ -166,6 +174,8 @@ class I18nRouter extends Router
 
     /**
      * To make compatible with Symfony <2.4
+     *
+     * @return array
      */
     public function matchRequest(Request $request)
     {
