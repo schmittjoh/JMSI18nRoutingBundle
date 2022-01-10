@@ -84,7 +84,7 @@ class JMSI18nRoutingExtension extends Extension
         }
     }
 
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'jms_i18n_routing';
     }
