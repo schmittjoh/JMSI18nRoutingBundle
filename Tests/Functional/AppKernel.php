@@ -23,7 +23,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 
 class AppKernel extends AbstractKernel
 {
-    function registerContainerConfiguration(LoaderInterface $loader)
+    function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(__DIR__.'/config/default.yml');
     }

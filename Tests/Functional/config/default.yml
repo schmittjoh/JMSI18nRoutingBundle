@@ -3,3 +3,6 @@ imports:
     - { resource: default_locale.php }
     - { resource: twig.yml }
 
+services:
+    annotation_reader:
+        class: Doctrine\Common\Annotations\AnnotationReader

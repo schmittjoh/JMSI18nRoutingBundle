@@ -25,9 +25,11 @@ class PrefixStrategyTest extends BaseTestCase
     /**
      * @dataProvider getLocaleChoosingTests
      */
-    public function testLocaleIsChoosenWhenHomepageIsRequested($acceptLanguages, $expectedLocale)
+    public function testLocaleIsChoosenWhenHomepageIsRequested($acceptLanguages, $expectedLocale): void
     {
-        $client = self::createClient(array(), array(
+        // workaround to avoid overwriting static::$class = null;
+        static::$class = PrefixStrategyKernel::class;
+        $client = static::createClient(array(), array(
             'HTTP_ACCEPT_LANGUAGE' => $acceptLanguages,
         ));
         $client->insulate();
@@ -37,7 +39,7 @@ class PrefixStrategyTest extends BaseTestCase
         self::assertTrue($client->getResponse()->isRedirect('/'.$expectedLocale.'/?extra=params'), (string) $client->getResponse());
     }
 
-    public function getLocaleChoosingTests()
+    public function getLocaleChoosingTests(): array
     {
         return array(
             array('en-us,en;q=0.5', 'en'),
@@ -46,9 +48,11 @@ class PrefixStrategyTest extends BaseTestCase
         );
     }
 
-    public function testLanguageCookieIsSet()
+    public function testLanguageCookieIsSet(): void
     {
-        $client = self::createClient(array());
+        // workaround to avoid overwriting static::$class = null;
+        static::$class = PrefixStrategyKernel::class;
+        $client = static::createClient(array());
         $client->insulate();
 
         $client->request('GET', '/?hl=de');
@@ -61,9 +65,11 @@ class PrefixStrategyTest extends BaseTestCase
         self::assertSame('de', $cookies[0]->getValue());
     }
 
-    public function testNoCookieOnError()
+    public function testNoCookieOnError(): void
     {
-        $client = self::createClient(array());
+        // workaround to avoid overwriting static::$class = null;
+        static::$class = PrefixStrategyKernel::class;
+        $client = static::createClient(array());
         $client->insulate();
 
         $client->request('GET', '/nonexistent');

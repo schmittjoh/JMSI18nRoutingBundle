@@ -30,7 +30,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  */
 class JMSI18nRoutingExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $config = $this->processConfiguration(new Configuration, $configs);
 
@@ -84,7 +84,7 @@ class JMSI18nRoutingExtension extends Extension
         }
     }
 
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'jms_i18n_routing';
     }

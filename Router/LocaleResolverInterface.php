@@ -22,5 +22,5 @@ interface LocaleResolverInterface
      * @return string|null may return null if no suitable locale is found, may also
      *                        return a locale which is not available for the matched route
      */
-    function resolveLocale(Request $request, array $availableLocales);
+    function resolveLocale(Request $request, array $availableLocales): ?string;
 }

@@ -31,7 +31,7 @@ use JMS\I18nRoutingBundle\Router\I18nLoader;
 
 class I18nLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $col = new RouteCollection();
         $col->add('contact', new Route('/contact'));
@@ -48,7 +48,7 @@ class I18nLoaderTest extends TestCase
         self::assertEquals('en', $en->getDefault('_locale'));
     }
 
-    public function testLoadDoesNotRemoveOriginalIfNotAllRoutesHaveTranslationsUnlessRedirectIsOff()
+    public function testLoadDoesNotRemoveOriginalIfNotAllRoutesHaveTranslationsUnlessRedirectIsOff(): void
     {
         $col = new RouteCollection();
         $col->add('support', new Route('/support'));
@@ -66,7 +66,7 @@ class I18nLoaderTest extends TestCase
     /**
      * @dataProvider getStrategies
      */
-    public function testLoadDoesNotAddI18nRoutesIfI18nIsFalse($strategy)
+    public function testLoadDoesNotAddI18nRoutesIfI18nIsFalse($strategy): void
     {
         $col = new RouteCollection();
         $col->add('route', new Route('/no-i18n', array(), array(), array('i18n' => false)));
@@ -76,7 +76,7 @@ class I18nLoaderTest extends TestCase
         self::assertNull($i18nCol->get('route')->getDefault('_locale'));
     }
 
-    public function testLoadUsesOriginalTranslationIfNoTranslationExists()
+    public function testLoadUsesOriginalTranslationIfNoTranslationExists(): void
     {
         $col = new RouteCollection();
         $col->add('untranslated_route', new Route('/not-translated'));
@@ -87,7 +87,7 @@ class I18nLoaderTest extends TestCase
         self::assertEquals('/not-translated', $i18nCol->get('en__RG__untranslated_route')->getPath());
     }
 
-    public function testLoadIfRouteIsNotTranslatedToAllLocales()
+    public function testLoadIfRouteIsNotTranslatedToAllLocales(): void
     {
         $col = new RouteCollection();
         $col->add('route', new Route('/not-available-everywhere', array(), array(), array('i18n_locales' => array('en'))));
@@ -96,7 +96,7 @@ class I18nLoaderTest extends TestCase
         self::assertEquals(array('en__RG__route'), array_keys($i18nCol->all()));
     }
 
-    public function testLoadIfStrategyIsPrefix()
+    public function testLoadIfStrategyIsPrefix(): void
     {
         $col = new RouteCollection();
         $col->add('contact', new Route('/contact'));
@@ -111,7 +111,7 @@ class I18nLoaderTest extends TestCase
         self::assertEquals('/en/contact', $en->getPath());
     }
 
-    public function testLoadIfStrategyIsPrefixExceptDefault()
+    public function testLoadIfStrategyIsPrefixExceptDefault(): void
     {
         $col = new RouteCollection();
         $col->add('contact', new Route('/contact'));
@@ -126,7 +126,7 @@ class I18nLoaderTest extends TestCase
         self::assertEquals('/contact', $en->getPath());
     }
 
-    public function testLoadAddsPrefix()
+    public function testLoadAddsPrefix(): void
     {
         $col = new RouteCollection();
         $col->add('dashboard', new Route('/dashboard', array(), array(), array('i18n_prefix' => '/admin')));
@@ -136,12 +136,12 @@ class I18nLoaderTest extends TestCase
         self::assertEquals('/admin/en/dashboard', $en->getPath());
     }
 
-    public function getStrategies()
+    public function getStrategies(): array
     {
         return array(array('custom'), array('prefix'), array('prefix_except_default'));
     }
 
-    private function getLoader($strategy = 'custom')
+    private function getLoader($strategy = 'custom'): I18nLoader
     {
         $translator = new Translator('en');
         $translator->addLoader('yml', new YamlFileLoader());

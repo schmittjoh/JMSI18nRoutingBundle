@@ -28,7 +28,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class SetRouterPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $container->setAlias('router', 'jms_i18n_routing.router')->setPublic(true);
 

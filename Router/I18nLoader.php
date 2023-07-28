@@ -42,7 +42,7 @@ class I18nLoader
         $this->patternGenerationStrategy = $patternGenerationStrategy;
     }
 
-    public function load(RouteCollection $collection)
+    public function load(RouteCollection $collection): RouteCollection
     {
         $i18nCollection = new RouteCollection();
         foreach ($collection->getResources() as $resource) {

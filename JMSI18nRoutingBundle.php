@@ -22,6 +22,7 @@ use JMS\I18nRoutingBundle\DependencyInjection\JMSI18nRoutingExtension;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use JMS\I18nRoutingBundle\DependencyInjection\Compiler\SetRouterPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -31,12 +32,12 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class JMSI18nRoutingBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new SetRouterPass());
     }
 
-    public function getContainerExtension()
+    public function getContainerExtension(): ?ExtensionInterface
     {
         return new JMSI18nRoutingExtension();
     }
