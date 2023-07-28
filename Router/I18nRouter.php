@@ -152,7 +152,7 @@ class I18nRouter extends Router
         return $this->matchI18n(parent::match($url), $url);
     }
 
-    public function getRouteCollection()
+    public function getRouteCollection(): \Symfony\Component\Routing\RouteCollection
     {
         $collection = parent::getRouteCollection();
 

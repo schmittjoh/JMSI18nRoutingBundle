@@ -27,7 +27,7 @@ abstract class AbstractKernel extends Kernel
 {
     private $config;
 
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return array(
             new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
