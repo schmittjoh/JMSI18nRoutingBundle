@@ -19,14 +19,14 @@
 namespace JMS\I18nRoutingBundle\Router;
 
 use JMS\I18nRoutingBundle\Exception\NotAcceptableLanguageException;
-
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * I18n Router implementation.
@@ -35,12 +35,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class I18nRouter extends Router
 {
-    private $hostMap = array();
-    private $i18nLoaderId;
+    private array $hostMap = array();
+    private ?string $i18nLoaderId;
     private $container;
     protected $defaultLocale;
-    private $redirectToHost = true;
-    private $localeResolver;
+    private bool $redirectToHost = true;
+    private ?LocaleResolverInterface $localeResolver;
 
     /**
      * Constructor.
@@ -58,7 +58,7 @@ class I18nRouter extends Router
         $this->container = func_get_arg(0);
     }
 
-    public function setLocaleResolver(LocaleResolverInterface $resolver)
+    public function setLocaleResolver(LocaleResolverInterface $resolver): void
     {
         $this->localeResolver = $resolver;
     }
@@ -69,9 +69,9 @@ class I18nRouter extends Router
      *
      * @param Boolean $bool
      */
-    public function setRedirectToHost($bool)
+    public function setRedirectToHost(bool $bool): void
     {
-        $this->redirectToHost = (Boolean) $bool;
+        $this->redirectToHost = $bool;
     }
 
     /**
@@ -79,17 +79,17 @@ class I18nRouter extends Router
      *
      * @param array $hostMap a map of locales to hosts
      */
-    public function setHostMap(array $hostMap)
+    public function setHostMap(array $hostMap): void
     {
         $this->hostMap = $hostMap;
     }
 
-    public function setI18nLoaderId($id)
+    public function setI18nLoaderId(string $id): void
     {
         $this->i18nLoaderId = $id;
     }
 
-    public function setDefaultLocale($locale)
+    public function setDefaultLocale(string $locale): void
     {
         $this->defaultLocale = $locale;
     }
@@ -97,7 +97,7 @@ class I18nRouter extends Router
     /**
      * {@inheritdoc}
      */
-    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
+    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH): string
     {
         // determine the most suitable locale to use for route generation
         $currentLocale = $this->context->getParameter('_locale');
@@ -147,19 +147,19 @@ class I18nRouter extends Router
     /**
      * {@inheritdoc}
      */
-    public function match($url)
+    public function match(string $pathinfo): array
     {
-        return $this->matchI18n(parent::match($url), $url);
+        return $this->matchI18n(parent::match($pathinfo), $pathinfo);
     }
 
-    public function getRouteCollection()
+    public function getRouteCollection(): \Symfony\Component\Routing\RouteCollection
     {
         $collection = parent::getRouteCollection();
 
         return $this->container->get($this->i18nLoaderId)->load($collection);
     }
 
-    public function getOriginalRouteCollection()
+    public function getOriginalRouteCollection(): \Symfony\Component\Routing\RouteCollection
     {
         return parent::getRouteCollection();
     }
@@ -167,7 +167,7 @@ class I18nRouter extends Router
     /**
      * To make compatible with Symfony <2.4
      */
-    public function matchRequest(Request $request)
+    public function matchRequest(Request $request): array
     {
         $matcher = $this->getMatcher();
         $pathInfo = $request->getPathInfo();
@@ -179,12 +179,8 @@ class I18nRouter extends Router
         return $this->matchI18n($matcher->matchRequest($request), $pathInfo);
     }
 
-    private function matchI18n(array $params, $url)
+    private function matchI18n(array $params, string $url): array
     {
-        if (false === $params) {
-            return false;
-        }
-
         $request = $this->getRequest();
 
         if (isset($params['_locales'])) {
@@ -279,7 +275,7 @@ class I18nRouter extends Router
     /**
      * @return Request|null
      */
-    private function getRequest()
+    private function getRequest(): ?Request
     {
         $request = null;
         if ($this->container->has('request_stack')) {

@@ -22,7 +22,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 
 class PrefixStrategyKernel extends AbstractKernel
 {
-    function registerContainerConfiguration(LoaderInterface $loader)
+    function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(__DIR__.'/config/strategy_prefix.yml');
     }

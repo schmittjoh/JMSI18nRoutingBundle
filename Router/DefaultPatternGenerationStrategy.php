@@ -16,9 +16,9 @@ use Symfony\Component\Routing\Route;
  */
 class DefaultPatternGenerationStrategy implements PatternGenerationStrategyInterface
 {
-    const STRATEGY_PREFIX = 'prefix';
-    const STRATEGY_PREFIX_EXCEPT_DEFAULT = 'prefix_except_default';
-    const STRATEGY_CUSTOM = 'custom';
+    public const STRATEGY_PREFIX = 'prefix';
+    public const STRATEGY_PREFIX_EXCEPT_DEFAULT = 'prefix_except_default';
+    public const STRATEGY_CUSTOM = 'custom';
 
     private $strategy;
     private $translator;
@@ -40,7 +40,7 @@ class DefaultPatternGenerationStrategy implements PatternGenerationStrategyInter
     /**
      * {@inheritDoc}
      */
-    public function generateI18nPatterns($routeName, Route $route)
+    public function generateI18nPatterns($routeName, Route $route): array
     {
         $patterns = array();
         foreach ($route->getOption('i18n_locales') ?: $this->locales as $locale) {
@@ -81,12 +81,12 @@ class DefaultPatternGenerationStrategy implements PatternGenerationStrategyInter
     /**
      * {@inheritDoc}
      */
-    public function addResources(RouteCollection $i18nCollection)
+    public function addResources(RouteCollection $i18nRouteCollection): void
     {
         foreach ($this->locales as $locale) {
             if (file_exists($metadata = $this->cacheDir.'/translations/catalogue.'.$locale.'.php.meta')) {
                 foreach (unserialize(file_get_contents($metadata)) as $resource) {
-                    $i18nCollection->addResource($resource);
+                    $i18nRouteCollection->addResource($resource);
                 }
             }
         }

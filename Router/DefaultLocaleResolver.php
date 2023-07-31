@@ -31,7 +31,7 @@ class DefaultLocaleResolver implements LocaleResolverInterface
     /**
      * {@inheritDoc}
      */
-    public function resolveLocale(Request $request, array $availableLocales)
+    public function resolveLocale(Request $request, array $availableLocales): ?string
     {
         if ($this->hostMap && isset($this->hostMap[$host = $request->getHost()])) {
             return $this->hostMap[$host];

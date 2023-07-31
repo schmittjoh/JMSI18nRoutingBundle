@@ -14,12 +14,12 @@ class DefaultLocaleResolverTest extends TestCase
     /**
      * @dataProvider getResolutionTests
      */
-    public function testResolveLocale(Request $request, array $locales, $expected, $message)
+    public function testResolveLocale(Request $request, array $locales, $expected, $message): void
     {
         self::assertSame($expected, $this->resolver->resolveLocale($request, $locales), $message);
     }
 
-    public function getResolutionTests()
+    public function getResolutionTests(): array
     {
         $tests = array();
 

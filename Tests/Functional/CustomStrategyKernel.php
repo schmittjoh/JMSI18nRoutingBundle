@@ -22,7 +22,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 
 class CustomStrategyKernel extends AbstractKernel
 {
-    function registerContainerConfiguration(LoaderInterface $loader)
+    function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(__DIR__.'/config/strategy_custom_with_hosts.yml');
     }

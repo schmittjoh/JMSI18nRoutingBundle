@@ -27,10 +27,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 class DefaultController
 {
     /**
-     * @Route("/", name = "homepage")
      * @Template
+     * @\Symfony\Component\Routing\Annotation\Route("/", name="homepage")
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request): array
     {
         $locale = method_exists($request, 'getLocale') ? $request->getLocale()
             : $request->getSession()->getLocale();

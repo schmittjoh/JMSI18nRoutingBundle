@@ -36,7 +36,7 @@ class NotAcceptableLanguageException extends NotAcceptableException
         return $this->requestedLanguage;
     }
 
-    public function getAvailableLanguages()
+    public function getAvailableLanguages(): array
     {
         return $this->availableLanguages;
     }

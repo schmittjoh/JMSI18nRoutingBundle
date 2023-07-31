@@ -21,14 +21,14 @@ interface PatternGenerationStrategyInterface
      *
      * @return array<string, array<string>> an array mapping the pattern to an array of locales
      */
-    function generateI18nPatterns($routeName, Route $route);
+    function generateI18nPatterns($routeName, Route $route): array;
 
     /**
      * You may add possible resources to the i18n collection.
      *
      * This may for example be translation resources.
      *
-     * @param RouteCollection $i18nRouteCollection
+     * @param RouteCollection $i18NRouteRouteCollection
      */
-    function addResources(RouteCollection $i18nRouteCollection);
+    function addResources(RouteCollection $i18NRouteRouteCollection): void;
 }

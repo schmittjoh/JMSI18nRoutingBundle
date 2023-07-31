@@ -32,7 +32,7 @@ use Symfony\Component\Routing\Route;
  */
 class DefaultRouteExclusionStrategy implements RouteExclusionStrategyInterface
 {
-    public function shouldExcludeRoute($routeName, Route $route)
+    public function shouldExcludeRoute($routeName, Route $route): bool
     {
         if ('_' === $routeName[0]) {
             return true;

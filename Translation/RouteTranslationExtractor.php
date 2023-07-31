@@ -39,12 +39,12 @@ class RouteTranslationExtractor implements ExtractorInterface
         $this->routeExclusionStrategy = $routeExclusionStrategy;
     }
 
-    public function setDomain($domain)
+    public function setDomain($domain): void
     {
         $this->domain = $domain;
     }
 
-    public function extract()
+    public function extract(): MessageCatalogue
     {
         $catalogue = new MessageCatalogue();
 

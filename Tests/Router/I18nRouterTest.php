@@ -39,7 +39,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class I18nRouterTest extends TestCase
 {
-    public function testGenerate()
+    public function testGenerate(): void
     {
         $router = $this->getRouter();
         self::assertEquals('/welcome-on-our-website', $router->generate('welcome'));
@@ -57,7 +57,7 @@ class I18nRouterTest extends TestCase
         self::assertEquals('/', $router->generate('homepage', array('_locale' => 'de')));
     }
 
-    public function testGenerateWithHostMap()
+    public function testGenerateWithHostMap(): void
     {
         $router = $this->getRouter();
         $router->setHostMap(array(
@@ -79,7 +79,7 @@ class I18nRouterTest extends TestCase
         self::assertEquals('http://de.host/willkommen-auf-unserer-webseite', $router->generate('welcome', array('_locale' => 'de'), UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
-    public function testGenerateDoesUseCorrectHostWhenSchemeChanges()
+    public function testGenerateDoesUseCorrectHostWhenSchemeChanges(): void
     {
         $router = $this->getRouter();
 
@@ -98,20 +98,20 @@ class I18nRouterTest extends TestCase
         self::assertEquals('https://de.test/einloggen', $router->generate('login', array('_locale' => 'de')));
     }
 
-    public function testGenerateDoesNotI18nInternalRoutes()
+    public function testGenerateDoesNotI18nInternalRoutes(): void
     {
         $router = $this->getRouter();
 
         self::assertEquals('/internal?_locale=de', $router->generate('_internal', array('_locale' => 'de')));
     }
 
-    public function testGenerateWithNonI18nRoute()
+    public function testGenerateWithNonI18nRoute(): void
     {
         $router = $this->getRouter('routing.yml', new IdentityTranslator());
         self::assertEquals('/this-is-used-for-checking-login', $router->generate('login_check'));
     }
 
-    public function testMatch()
+    public function testMatch(): void
     {
         $router = $this->getRouter();
         $router->setHostMap(array(
@@ -138,7 +138,7 @@ class I18nRouterTest extends TestCase
         ), $router->match('/willkommen-auf-unserer-webseite'));
     }
 
-    public function testRouteNotFoundForActiveLocale()
+    public function testRouteNotFoundForActiveLocale(): void
     {
         $router = $this->getNonRedirectingHostMapRouter();
         $context = new RequestContext();
@@ -165,7 +165,7 @@ class I18nRouterTest extends TestCase
     /**
      * Tests whether sublocales are properly translated (en_UK and en_US can use different patterns)
      */
-    public function testSubLocaleTranslation()
+    public function testSubLocaleTranslation(): void
     {
         // Note that the default is set to en_UK by getDoubleLocaleRouter()
         $router = $this->getNonRedirectingHostMapRouter();
@@ -186,7 +186,7 @@ class I18nRouterTest extends TestCase
     /**
      * @dataProvider getMatchThrowsExceptionFixtures
      */
-    public function testMatchThrowsException($locale, $host, $pattern)
+    public function testMatchThrowsException($locale, $host, $pattern): void
     {
         $this->expectException(ResourceNotFoundException::class);
 
@@ -199,7 +199,7 @@ class I18nRouterTest extends TestCase
         $router->match($pattern);
     }
 
-    public function getMatchThrowsExceptionFixtures()
+    public function getMatchThrowsExceptionFixtures(): array
     {
         return array(
             array('en_UK', 'uk.tests', '/nieuws'),
@@ -212,7 +212,7 @@ class I18nRouterTest extends TestCase
     /**
      * @dataProvider getGenerateThrowsExceptionFixtures
      */
-    public function testGenerateThrowsException($locale, $host, $route)
+    public function testGenerateThrowsException($locale, $host, $route): void
     {
         $this->expectException(RouteNotFoundException::class);
 
@@ -225,7 +225,7 @@ class I18nRouterTest extends TestCase
         $router->generate($route);
     }
 
-    public function getGenerateThrowsExceptionFixtures()
+    public function getGenerateThrowsExceptionFixtures(): array
     {
         return array(
             array('en_UK', 'uk.tests', 'dutch_only'),
@@ -233,7 +233,7 @@ class I18nRouterTest extends TestCase
         );
     }
 
-    public function testMatchThrowsResourceNotFoundWhenRouteIsUsedByMultipleLocalesOnDifferentHost()
+    public function testMatchThrowsResourceNotFoundWhenRouteIsUsedByMultipleLocalesOnDifferentHost(): void
     {
         $this->expectException(ResourceNotFoundException::class);
         $this->expectExceptionMessage('The route "sub_locale" is not available on the current host "us.test", but only on these hosts "uk.test, nl.test, be.test".');
@@ -246,7 +246,7 @@ class I18nRouterTest extends TestCase
         $router->match('/english');
     }
 
-    public function testMatchThrowsNotAcceptableLanguageWhenRouteIsUsedByMultipleOtherLocalesOnSameHost()
+    public function testMatchThrowsNotAcceptableLanguageWhenRouteIsUsedByMultipleOtherLocalesOnSameHost(): void
     {
         $this->expectException(NotAcceptableLanguageException::class);
         $this->expectExceptionMessage('The requested language "en_US" was not available. Available languages: "en_UK, nl_NL, nl_BE"');
@@ -265,7 +265,7 @@ class I18nRouterTest extends TestCase
         $router->match('/english');
     }
 
-    public function testMatchCallsLocaleResolverIfRouteSupportsMultipleLocalesAndContextHasNoLocale()
+    public function testMatchCallsLocaleResolverIfRouteSupportsMultipleLocalesAndContextHasNoLocale(): void
     {
         $localeResolver = $this->createMock('JMS\I18nRoutingBundle\Router\LocaleResolverInterface');
 
@@ -291,7 +291,7 @@ class I18nRouterTest extends TestCase
         self::assertSame('de', $params['_locale']);
     }
 
-    private function getRouter($config = 'routing.yml', $translator = null, $localeResolver = null)
+    private function getRouter($config = 'routing.yml', $translator = null, $localeResolver = null): I18nRouter
     {
         $container = new Container();
         $container->set('routing.loader', new YamlFileLoader(new FileLocator(__DIR__.'/Fixture')));
@@ -320,7 +320,8 @@ class I18nRouterTest extends TestCase
     /**
      * Gets the translator required for checking the DoubleLocale tests (en_UK etc)
      */
-    private function getNonRedirectingHostMapRouter($config = 'routing.yml') {
+    private function getNonRedirectingHostMapRouter($config = 'routing.yml'): I18nRouter
+    {
         $container = new Container();
         $container->set('routing.loader', new YamlFileLoader(new FileLocator(__DIR__.'/Fixture')));
 

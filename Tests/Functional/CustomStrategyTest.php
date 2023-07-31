@@ -22,7 +22,7 @@ class CustomStrategyTest extends BaseTestCase
 {
     protected static $class = CustomStrategyKernel::class;
 
-    public function testDefaultLocaleIsSetCorrectly()
+    public function testDefaultLocaleIsSetCorrectly(): void
     {
         $client = self::createClient(array(), array(
             'HTTP_HOST' => 'de.host',

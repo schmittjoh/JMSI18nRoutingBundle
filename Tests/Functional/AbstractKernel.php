@@ -27,7 +27,7 @@ abstract class AbstractKernel extends Kernel
 {
     private $config;
 
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return array(
             new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
@@ -38,29 +38,29 @@ abstract class AbstractKernel extends Kernel
         );
     }
 
-    abstract function registerContainerConfiguration(LoaderInterface $loader);
+    abstract public function registerContainerConfiguration(LoaderInterface $loader): void;
 
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         return __DIR__;
     }
 
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return sys_get_temp_dir().'/JMSI18nRoutingBundle/cache';
     }
 
-    public function getLogDir()
+    public function getLogDir(): string
     {
         return sys_get_temp_dir().'/JMSI18nRoutingBundle/logs';
     }
 
-    public function serialize()
+    public function serialize(): string
     {
         return serialize(array($this->config));
     }
 
-    public function unserialize($str)
+    public function unserialize($str): void
     {
         call_user_func_array(array($this, '__construct'), unserialize($str));
     }

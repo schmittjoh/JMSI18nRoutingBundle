@@ -35,5 +35,5 @@ interface RouteExclusionStrategyInterface
      *
      * @return Boolean
      */
-    function shouldExcludeRoute($routeName, Route $route);
+    function shouldExcludeRoute($routeName, Route $route): bool;
 }
